@@ -106,12 +106,15 @@ model
 
 # In[13]:
 
+model
+# best = model.get_best()
+best = model.get_best(15)
 
-pysr_eq = model.get_best()["lambda_format"]
+pysr_eq = best["lambda_format"]  # <-- manual choice if not training now
 pysr_eq
 
-print("Best model:")
-print(model.get_best()["equation"])
+print("Selected model:")
+print(best["equation"])
 
 
 # In[14]:
