@@ -17,7 +17,7 @@ import pandas as pd
 
 
 # df = pd.read_csv("ci034243xsi20040112_053635.txt")
-df = pd.read_csv("AqSolDBc.csv")
+df = pd.read_csv("AqSolDBc.csv").sample(1_024, random_state=42).reset_index(drop=True)  # author suggests >1000 not needed
 
 
 # In[4]:
@@ -60,25 +60,26 @@ from pysr import PySRRegressor
 # In[ ]:
 
 
-model = PySRRegressor(
-    'best',
-    populations=48,
-    niterations=2_048,
-    maxsize=32,
-    maxdepth=16,
-    batching=True,
-    batch_size=512,
-    binary_operators=["*", "+", "-", "/"],
-    unary_operators=["exp", "log", "abs"],
-    progress=True,
-    denoise=True,
-    # select_k_features=32,  <-- while tempting, the author says this often doesn't help
-    #
-    #
-    # random_state=42,  <-- 
-    # deterministic=True,  <-- can't enable this unless willing to run in serial
-    # parallelism="serial", <-- 
-)
+# model = PySRRegressor(
+#     'best',
+#     populations=96,
+#     niterations=1_000_000,  # run until i interrupt
+#     maxsize=32,
+#     maxdepth=16,
+#     batching=True,
+#     batch_size=512,
+#     binary_operators=["*", "+", "-", "/"],
+#     unary_operators=["exp", "log", "abs"],
+#     progress=True,
+#     # denoise=True,  <-- takes forever
+#     # select_k_features=32,  <-- while tempting, the author says this often doesn't help
+#     #
+#     #
+#     # random_state=42,  <-- 
+#     # deterministic=True,  <-- can't enable this unless willing to run in serial
+#     # parallelism="serial", <-- 
+# )
+model = PySRRegressor.from_file(run_directory="outputs/20250927_130113_o3wIvl")
 
 
 # In[10]:
@@ -93,7 +94,8 @@ df = df.loc[feature_df.index]
 
 
 # model.fit(feature_df, df[["measured log(solubility:mol/L)"]])
-model.fit(feature_df, df[["ExperimentalLogS"]])
+# model.fit(feature_df, df[["ExperimentalLogS"]])  <-- uncomment to run training if not loading form file
+# could also do a warm start
 
 
 # In[12]:
@@ -107,6 +109,9 @@ model
 
 pysr_eq = model.get_best()["lambda_format"]
 pysr_eq
+
+print("Best model:")
+print(model.get_best()["equation"])
 
 
 # In[14]:
@@ -123,7 +128,7 @@ import numpy as np
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 
 
-def parity_plot(y_true, y_pred):
+def parity_plot(y_true, y_pred, outname):
     """Create a parity plot with regression statistics."""
     # Compute regression statistics
     r2 = r2_score(y_true, y_pred)
@@ -162,12 +167,12 @@ def parity_plot(y_true, y_pred):
     plt.gca().set_aspect("equal", adjustable="box")
     plt.grid(alpha=0.3)
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f"{outname}.png", dpi=300)
 
 # y_true = df["measured log(solubility:mol/L)"].values
 y_true = df["ExperimentalLogS"].values
 y_pred = train_pred
-parity_plot(y_true, y_pred)
+parity_plot(y_true, y_pred, "train_parity")
 
 
 # In[16]:
@@ -243,5 +248,5 @@ if infs.sum() > 0:
 # In[24]:
 
 
-parity_plot(test_true, test_pred)
+parity_plot(test_true, test_pred, "test_parity")
 
