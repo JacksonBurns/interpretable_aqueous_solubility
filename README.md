@@ -11,3 +11,7 @@ This is perhaps the final equation:
 ```
 FractionCSP3 - (exp((((MolLogP * 1.9045392) + -8.334743) - abs(VSA_EState9 * log(qed))) / Chi0v) * 5.45409)
 ```
+
+python3.14 then `pip install torchsisso`
+
+`pip install numpy pandas matplotlib rdkit scipy scikit-learn`

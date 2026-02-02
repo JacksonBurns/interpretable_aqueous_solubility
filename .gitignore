@@ -1,2 +1,4 @@
 outputs
 screen.log
+.vscode
+__pycache__
