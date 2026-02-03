@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from scipy.stats import gaussian_kde, pearsonr
+from scipy.stats import pearsonr
 
 import sympy as sp
 
@@ -10,7 +10,6 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 from rdkit.Chem import MolFromSmiles
 from rdkit.ML.Descriptors import MoleculeDescriptors
-
 
 DESCRIPTORS = [
     "MolWt",
@@ -135,6 +134,7 @@ DESCRIPTORS = [
     "fr_unbrch_alkane",
     "fr_urea",
 ]
+COUNT_DESCRIPTORS = [c for c in DESCRIPTORS if c.startswith("fr_") or c.startswith("Num")] + ["TPSA"]
 CALCULATOR = MoleculeDescriptors.MolecularDescriptorCalculator(DESCRIPTORS)
 
 
@@ -147,7 +147,7 @@ def _f(smiles):
 
 
 def parity_plot(y_true, y_pred, outname):
-    """Create a parity plot with regression statistics."""
+    """Create a parity plot with hexbin-based density."""
     # Compute regression statistics
     r, _ = pearsonr(y_true, y_pred)
     rmse = np.sqrt(mean_squared_error(y_true, y_pred))
@@ -155,10 +155,26 @@ def parity_plot(y_true, y_pred, outname):
 
     # Create plot
     plt.figure(figsize=(6, 6))
-    plt.scatter(y_true, y_pred, alpha=0.6, edgecolor="k", facecolor="C0", s=40)
+
+    hb = plt.hexbin(
+        y_true,
+        y_pred,
+        gridsize=50,
+        mincnt=1,
+    )
+    cb = plt.colorbar(
+        hb,
+        fraction=0.04,  # width relative to axes
+        pad=0.02,       # gap between plot and colorbar
+        shrink=0.85,     # height scaling
+    )
+    cb.set_label("# of Compounds", fontsize=11)
 
     # 1:1 line
-    lims = [min(y_true.min(), y_pred.min()), max(y_true.max(), y_pred.max())]
+    lims = [
+        min(y_true.min(), y_pred.min()),
+        max(y_true.max(), y_pred.max()),
+    ]
     plt.plot(lims, lims, color="red", linestyle="--", linewidth=1.5)
 
     # Labels and title
@@ -167,7 +183,11 @@ def parity_plot(y_true, y_pred, outname):
     plt.title("Parity Plot", fontsize=14)
 
     # Annotation with statistics
-    stats_text = f"$r$ = {r:.3f}\n" f"RMSE = {rmse:.3f}\n" f"MAE = {mae:.3f}"
+    stats_text = (
+        f"$r$ = {r:.3f}\n"
+        f"RMSE = {rmse:.3f}\n"
+        f"MAE = {mae:.3f}"
+    )
     plt.text(
         0.05,
         0.95,
@@ -185,26 +205,60 @@ def parity_plot(y_true, y_pred, outname):
     plt.tight_layout()
     plt.savefig(f"{outname}.png", dpi=300)
 
+from sklearn.ensemble import RandomForestRegressor
 
-def downsample_to_uniform(df, target_col, random_state=0):
-    rng = np.random.default_rng(random_state)
+def robust_screen_features(df, target_col, force_include=None, n_keep=20):
+    """
+    Screens features using Random Forest importance (captures interactions),
+    while bypassing screening for 'force_include' features.
+    """
+    if force_include is None:
+        force_include = []
+    
+    # 1. Separate "forced" features from "candidate" features
+    # Ensure forced features actually exist in the dataframe
+    valid_force = [f for f in force_include if f in df.columns]
+    missing = set(force_include) - set(valid_force)
+    if missing:
+        print(f"Warning: Forced features not found in DF: {missing}")
+        
+    # Candidates are everything else (excluding target and forced)
+    candidates = [c for c in df.columns if c != target_col and c not in valid_force]
+    
+    # 2. If we already have few enough candidates, just return
+    if len(candidates) + len(valid_force) <= n_keep:
+        print(f"Feature count ({len(candidates) + len(valid_force)}) is below limit ({n_keep}). No screening needed.")
+        return df[valid_force + candidates + [target_col]]
 
-    x = df[target_col].to_numpy()
+    print(f"Screening {len(candidates)} candidate features with Random Forest...")
 
-    # Estimate density of the target distribution
-    kde = gaussian_kde(x)
-    p = kde(x)
+    # 3. Train Random Forest to judge "candidate" usefulness
+    # We use a lightweight forest (100 trees) to gauge importance
+    X = df[candidates]
+    y = df[target_col]
+    
+    rf = RandomForestRegressor(n_estimators=100, n_jobs=-1, random_state=42, verbose=1)
+    rf.fit(X, y)
+    
+    # 4. Select top features to fill the remaining slots
+    slots_remaining = n_keep - len(valid_force)
+    if slots_remaining <= 0:
+        print("Warning: 'force_include' list filled all available slots. Dropping all candidates.")
+        selected_candidates = []
+    else:
+        # Get feature importances and sort indices
+        importances = rf.feature_importances_
+        indices = np.argsort(importances)[::-1] # Descending order
+        top_indices = indices[:slots_remaining]
+        selected_candidates = [candidates[i] for i in top_indices]
+        
+        print(f"Selected top {len(selected_candidates)} candidates via RF Importance:")
+        for i in range(slots_remaining):
+            print(f" - {selected_candidates[i]} (Imp: {importances[indices[i]]:.4f})")
 
-    # Inverse-density acceptance probabilities
-    # Normalize so max acceptance prob = 1
-    accept_prob = 1.0 / p
-    accept_prob /= accept_prob.max()
-
-    # Rejection sampling
-    keep = rng.random(len(df)) < accept_prob
-
-    return df.loc[keep].reset_index(drop=True)
-
+    # 5. Reconstruct DataFrame with Forced + Selected features (target goes first for SISSO)
+    final_cols =  [target_col] + valid_force + selected_candidates
+    return df[final_cols]
 
 def sympy_df_function(expr_str: str):
     # Parse expression
@@ -239,35 +293,54 @@ if __name__ == "__main__":
     import pandas as pd
 
     # data loading
-
     df = pd.read_csv("aqsoldbc.csv")
     print(f"Original dataframe has {df.shape[0]} entries")
+
     # bound to -7 and -3 for applications to drug discovery
     df = df[(df["logS"] < -3) & (df["logS"] > -7)].reset_index(drop=True)
     print(f"Dropping samples outside of bounds reduces to {df.shape[0]} entries")
-    # optional downsample to a uniform distribution
-    # df = downsample_to_uniform(df, "logS")
-    # print(f"Uniform downsampling further reduces to {df.shape[0]} entries")
 
     # feature calculation
-
     feature_df = pd.DataFrame(columns=DESCRIPTORS, data=df["SMILES"].map(_f).to_list())
     feature_df = feature_df.dropna(axis=1)
     df = df.loc[feature_df.index]
     df = pd.concat((df, feature_df), axis=1)
+
+    # filter to drug-like
+    lipinski = (
+        (df["MolWt"] <= 500).astype(int)
+        + (df["NumHAcceptors"] <= 10).astype(int)
+        + (df["NumHDonors"] <= 5).astype(int)
+        + (df["MolLogP"] <= 5).astype(int)
+    ).ge(3)
+    df = df[lipinski].reset_index(drop=True)
+    print(f"Removing Rule of 5 Violators Reduced to {df.shape[0]} entries")
+
+    # feature engineering - convert discrete into density
+    for col in COUNT_DESCRIPTORS:
+        df[f"{col}_norm"] = df[col] / df["HeavyAtomCount"]
+
+    # SISSO treats first column as target, remainder as features
     sisso_df = df.drop(
         columns="SMILES"
-    )  # SISSO treats first column as target, remainder as features
+    )
+
+    # our implementation of feature initial_screening
+    sisso_df = robust_screen_features(
+        sisso_df, 
+        target_col="logS", 
+        force_include=["TPSA_norm", "MolWt", "HeavyAtomCount"], 
+        n_keep=10,
+    )
 
     # model training
     # see: https://github.com/PaulsonLab/TorchSISSO/blob/main/README.md#installation
-
     sm = SissoModel(
         sisso_df,
         use_gpu=True,
-        operators=["+", "-", "*", "/", "log", "pow(2)"],
-        n_term=2,  # terms in final equation - could do a scree plot to determine this
-        initial_screening = ["mi", 0.95],  # use mutual information to eliminate unnecessary features  --> needed if many features used
+        operators=["+", "-", "*", "/", "pow(2)", "log", "sqrt"],
+        n_term=3,  # terms in final equation - could do a scree plot to determine this
+        initial_screening=None,  # done manually
         n_expansion=3,  # hyperparameter, default 3
         k=20,  # hyperparameter, default 20
     )
@@ -275,23 +348,26 @@ if __name__ == "__main__":
     # Run the SISSO algorithm to get the interpretable model with the highest accuracy
     rmse, equation, r2, eqn_terms = sm.fit()
     equation = sympy_df_function(equation)
-
     y_true = df["logS"].values
     y_pred = equation(df)
     parity_plot(y_true, y_pred, "train_parity")
 
-    test_df = pd.read_csv("biogen.csv")  # <-- already bounded
-
-    # test_df = pd.read_csv("ochem.csv")
-    # test_df = test_df[(test_df["logS"] < -3) & (test_df["logS"] > -7)].reset_index(drop=True)
-
-    test_df = test_df[test_df["SMILES"].map(lambda s: MolFromSmiles(s) is not None).to_list()]
-    train_smiles = set(map(CanonSmiles, df["SMILES"]))
-    _original_length = test_df.shape[0]
-    test_df = test_df[~test_df["SMILES"].map(CanonSmiles).isin(train_smiles)]
-    print(f"Filtered {(_original_length - test_df.shape[0])} overlapping molecules from test set.")
-
-    test_features = pd.DataFrame(columns=DESCRIPTORS, data=test_df["SMILES"].map(_f).to_list())
-    test_pred = equation(test_features)
-    test_true = test_df["logS"].values
-    parity_plot(test_true, test_pred, "test_parity")
+    # inference
+    for f in ("biogen", "ochem"):
+        test_df = pd.read_csv(f + ".csv")
+        test_df = test_df[(test_df["logS"] < -3) & (test_df["logS"] > -7)].reset_index(drop=True)
+        test_df = test_df[test_df["SMILES"].map(lambda s: MolFromSmiles(s) is not None).to_list()]
+        train_smiles = set(map(CanonSmiles, df["SMILES"]))
+        _original_length = test_df.shape[0]
+        test_df = test_df[~test_df["SMILES"].map(CanonSmiles).isin(train_smiles)]
+        print(
+            f"Filtered {(_original_length - test_df.shape[0])} overlapping molecules from {f} test set."
+        )
+        test_features = pd.DataFrame(columns=DESCRIPTORS, data=test_df["SMILES"].map(_f).to_list())
+        for col in COUNT_DESCRIPTORS:
+            test_features[f"{col}_norm"] = test_features[col] / test_features["HeavyAtomCount"]
+        test_pred = equation(test_features)
+        print(f"Clipping {(test_pred > -3).astype(int).sum() + (test_pred < -7).astype(int).sum()} predictions")
+        test_pred = test_pred.clip(min=-7, max=-3)
+        test_true = test_df["logS"].values
+        parity_plot(test_true, test_pred, f"{f}_test_parity")
