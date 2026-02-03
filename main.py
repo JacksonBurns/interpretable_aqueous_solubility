@@ -314,10 +314,6 @@ if __name__ == "__main__":
     df = df[(df["logS"] < -3) & (df["logS"] > -7)].reset_index(drop=True)
     print(f"Dropping samples outside of bounds reduces to {df.shape[0]} entries")
 
-    # random downsampling
-    df = df.sample(n=256, random_state=42).reset_index(drop=True)
-    print(f"Random downsampled to {df.shape[0]} entries")
-
     # feature calculation
     feature_df = pd.DataFrame(columns=DESCRIPTORS, data=df["SMILES"].map(_f).to_list())
     feature_df = feature_df.dropna(axis=1)
@@ -359,7 +355,7 @@ if __name__ == "__main__":
         sisso_df, 
         target_col="logS", 
         force_include=["MolLogP", "MolMR", "TPSA_norm", "MolWt", "HeavyAtomCount", "AromaticProportion"], 
-        n_keep=50,
+        n_keep=20,
     )
 
     # model training
@@ -368,10 +364,10 @@ if __name__ == "__main__":
         sisso_df,
         use_gpu=True,
         operators=["+", "-", "*", "/", "pow(2)", "log", "sqrt"],
-        n_term=3,  # terms in final equation - could do a scree plot to determine this
+        n_term=2,  # terms in final equation - could do a scree plot to determine this
         initial_screening=None,  # done manually
         n_expansion=2,  # hyperparameter, default 3
-        k=100,  # hyperparameter, default 20
+        k=20,  # hyperparameter, default 20
     )
 
     # Run the SISSO algorithm to get the interpretable model with the highest accuracy
