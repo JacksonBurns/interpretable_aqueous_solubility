@@ -11,6 +11,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 from rdkit.Chem import MolFromSmiles
 from rdkit.ML.Descriptors import MoleculeDescriptors
 
+from esol import fit_esol
+
 DESCRIPTORS = [
     "MolWt",
     "HeavyAtomMolWt",
@@ -136,6 +138,18 @@ DESCRIPTORS = [
 ]
 COUNT_DESCRIPTORS = [c for c in DESCRIPTORS if c.startswith("fr_") or c.startswith("Num")] + ["TPSA"]
 CALCULATOR = MoleculeDescriptors.MolecularDescriptorCalculator(DESCRIPTORS)
+
+from rdkit import Chem
+
+def add_ap(df):
+    aromatic_query = Chem.MolFromSmarts("a")
+
+    def calc_ap(smiles):
+        mol = Chem.MolFromSmiles(smiles)
+        return len(mol.GetSubstructMatches(aromatic_query)) / mol.GetNumAtoms()
+
+    df["AromaticProportion"] = df["SMILES"].map(calc_ap)
+    return df
 
 
 def _f(smiles):
@@ -300,6 +314,10 @@ if __name__ == "__main__":
     df = df[(df["logS"] < -3) & (df["logS"] > -7)].reset_index(drop=True)
     print(f"Dropping samples outside of bounds reduces to {df.shape[0]} entries")
 
+    # random downsampling
+    df = df.sample(n=256, random_state=42).reset_index(drop=True)
+    print(f"Random downsampled to {df.shape[0]} entries")
+
     # feature calculation
     feature_df = pd.DataFrame(columns=DESCRIPTORS, data=df["SMILES"].map(_f).to_list())
     feature_df = feature_df.dropna(axis=1)
@@ -316,9 +334,20 @@ if __name__ == "__main__":
     df = df[lipinski].reset_index(drop=True)
     print(f"Removing Rule of 5 Violators Reduced to {df.shape[0]} entries")
 
-    # feature engineering - convert discrete into density
+    # feature engineering - convert discrete into density, add AP
     for col in COUNT_DESCRIPTORS:
         df[f"{col}_norm"] = df[col] / df["HeavyAtomCount"]
+    df = add_ap(df)
+
+    # baseline: ESOL
+    esol_predict, esol_result = fit_esol(
+        df,
+        smiles_col="SMILES",
+        target_col="logS",
+    )
+    print(esol_result)
+    y_pred = esol_predict(df)
+    parity_plot(df.loc[y_pred.index, "logS"], y_pred, "esol_train_parity")
 
     # SISSO treats first column as target, remainder as features
     sisso_df = df.drop(
@@ -329,8 +358,8 @@ if __name__ == "__main__":
     sisso_df = robust_screen_features(
         sisso_df, 
         target_col="logS", 
-        force_include=["TPSA_norm", "MolWt", "HeavyAtomCount"], 
-        n_keep=10,
+        force_include=["MolLogP", "MolMR", "TPSA_norm", "MolWt", "HeavyAtomCount", "AromaticProportion"], 
+        n_keep=50,
     )
 
     # model training
@@ -341,8 +370,8 @@ if __name__ == "__main__":
         operators=["+", "-", "*", "/", "pow(2)", "log", "sqrt"],
         n_term=3,  # terms in final equation - could do a scree plot to determine this
         initial_screening=None,  # done manually
-        n_expansion=3,  # hyperparameter, default 3
-        k=20,  # hyperparameter, default 20
+        n_expansion=2,  # hyperparameter, default 3
+        k=100,  # hyperparameter, default 20
     )
 
     # Run the SISSO algorithm to get the interpretable model with the highest accuracy
@@ -350,7 +379,7 @@ if __name__ == "__main__":
     equation = sympy_df_function(equation)
     y_true = df["logS"].values
     y_pred = equation(df)
-    parity_plot(y_true, y_pred, "train_parity")
+    parity_plot(y_true, y_pred, "sisso_train_parity")
 
     # inference
     for f in ("biogen", "ochem"):
@@ -363,11 +392,23 @@ if __name__ == "__main__":
         print(
             f"Filtered {(_original_length - test_df.shape[0])} overlapping molecules from {f} test set."
         )
+
+        # esol
+        y_pred = esol_predict(test_df)
+        parity_plot(test_df.loc[y_pred.index, "logS"], y_pred, f"esol_{f}_parity")
+
+        # sisso
+        smiles = test_df["SMILES"].to_list()
+        logs = test_df["logS"].to_list()
         test_features = pd.DataFrame(columns=DESCRIPTORS, data=test_df["SMILES"].map(_f).to_list())
+        test_features.insert(0, "SMILES", smiles)
+        test_features.insert(1, "logS", logs)
         for col in COUNT_DESCRIPTORS:
             test_features[f"{col}_norm"] = test_features[col] / test_features["HeavyAtomCount"]
+        test_features = add_ap(test_features)
+        # sisso
         test_pred = equation(test_features)
         print(f"Clipping {(test_pred > -3).astype(int).sum() + (test_pred < -7).astype(int).sum()} predictions")
         test_pred = test_pred.clip(min=-7, max=-3)
         test_true = test_df["logS"].values
-        parity_plot(test_true, test_pred, f"{f}_test_parity")
+        parity_plot(test_true, test_pred, f"sisso_{f}_parity")
