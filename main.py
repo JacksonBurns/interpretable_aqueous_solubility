@@ -49,7 +49,7 @@ DESCRIPTORS = [
     "NumUnspecifiedAtomStereoCenters",
     "RingCount",
     "MolLogP",
-    "MolMR",
+    # "MolMR",  <-- hard to interpret
     "fr_Al_COO",
     "fr_Al_OH",
     "fr_Al_OH_noTert",
@@ -402,7 +402,7 @@ if __name__ == "__main__":
         df, 
         target_col="logS", 
         force_include=["SMILES", "MolLogP", "MolMR", "TPSA_norm", "MolWt", "HeavyAtomCount", "AromaticProportion"], 
-        n_keep=20,
+        n_keep=15 + 1,  # +1 for SMILES
     )
 
     # clustering-based downsampling
@@ -420,11 +420,11 @@ if __name__ == "__main__":
     sm = SissoModel(
         sisso_df,
         use_gpu=True,
-        operators=["+", "-", "*", "/", "pow(2)", "log", "sqrt"],
-        n_term=4,  # terms in final equation - could do a scree plot to determine this
+        operators=["+", "-"],
+        n_term=2,  # terms in final equation - could do a scree plot to determine this
         initial_screening=None,  # done manually
-        n_expansion=3,  # hyperparameter, default 3
-        k=20,  # hyperparameter, default 20
+        n_expansion=2,  # hyperparameter, default 3
+        k=30,  # hyperparameter, default 20
     )
 
     # Run the SISSO algorithm to get the interpretable model with the highest accuracy
@@ -465,5 +465,12 @@ if __name__ == "__main__":
             test_features = add_ap(test_features)
             # sisso
             test_pred = equation(test_features)
+            # nans
+            nan_guess = np.nanmean(test_pred)
+            for i in range(len(smiles)):
+                if np.isnan(test_pred[i]):
+                    print("nan prediction found, replacing with nan mean")
+                    print(test_features.iloc[i, :])
+                    test_pred[i] = nan_guess
             test_true = test_df["logS"].values
             parity_plot(test_true, test_pred, f"results/sisso_{f}{'_full' if full else ''}_parity")
