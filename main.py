@@ -141,6 +141,56 @@ CALCULATOR = MoleculeDescriptors.MolecularDescriptorCalculator(DESCRIPTORS)
 
 from rdkit import Chem
 
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import StandardScaler
+
+import pandas as pd
+import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import StandardScaler
+
+def cluster_and_downsample(df, max_k=10, samples_per_cluster=50):
+    """
+    Identifies optimal clusters based on features (all columns except the first)
+    and downsamples the dataframe while keeping the target column intact.
+    """
+    # 1. Separate target and features
+    # We assume the first column is the SMILES and the second is target
+    features = df.iloc[:, 2:] 
+    
+    # 2. Preprocessing: Scale only the features
+    scaler = StandardScaler()
+    scaled_features = scaler.fit_transform(features)
+    
+    best_k = 2
+    best_score = -1
+    
+    # 3. Identify ideal number of clusters (Silhouette Score)
+    for k in range(2, max_k + 1):
+        kmeans = KMeans(n_clusters=k, n_init='auto', random_state=42)
+        labels = kmeans.fit_predict(scaled_features)
+        score = silhouette_score(scaled_features, labels)
+        
+        if score > best_score:
+            best_score = score
+            best_k = k
+            
+    print(f"Optimal clusters found: {best_k} (Silhouette Score: {best_score:.3f})")
+    
+    # 4. Apply optimal clustering and add label back to the original full DF
+    final_kmeans = KMeans(n_clusters=best_k, n_init='auto', random_state=42)
+    df['_cluster_label'] = final_kmeans.fit_predict(scaled_features)
+    
+    # 5. Downsample the original dataframe (containing the target)
+    downsampled_df = df.groupby('_cluster_label', group_keys=False).apply(
+        lambda x: x.sample(min(len(x), samples_per_cluster), random_state=42)
+    )
+    return downsampled_df.reset_index(drop=True)
+
 def add_ap(df):
     aromatic_query = Chem.MolFromSmarts("a")
 
@@ -330,6 +380,8 @@ if __name__ == "__main__":
     df = df[lipinski].reset_index(drop=True)
     print(f"Removing Rule of 5 Violators Reduced to {df.shape[0]} entries")
 
+    df[["SMILES", "logS"]].to_csv("chemeleon_aqsoldbc_filtered_train.csv", index=False)
+
     # feature engineering - convert discrete into density, add AP
     for col in COUNT_DESCRIPTORS:
         df[f"{col}_norm"] = df[col] / df["HeavyAtomCount"]
@@ -345,17 +397,22 @@ if __name__ == "__main__":
     y_pred = esol_predict(df)
     parity_plot(df.loc[y_pred.index, "logS"], y_pred, "esol_train_parity")
 
+    # our implementation of feature initial_screening
+    df = robust_screen_features(
+        df, 
+        target_col="logS", 
+        force_include=["SMILES", "MolLogP", "MolMR", "TPSA_norm", "MolWt", "HeavyAtomCount", "AromaticProportion"], 
+        n_keep=20,
+    )
+
+    # clustering-based downsampling
+    df = df[['SMILES'] + [col for col in df.columns if col != 'SMILES']]  # ensure SMILES is first
+    df = cluster_and_downsample(df, max_k=10, samples_per_cluster=50)
+    print(f"After cluster-based downsampling, dataset has {df.shape[0]} rows")
+
     # SISSO treats first column as target, remainder as features
     sisso_df = df.drop(
         columns="SMILES"
-    )
-
-    # our implementation of feature initial_screening
-    sisso_df = robust_screen_features(
-        sisso_df, 
-        target_col="logS", 
-        force_include=["MolLogP", "MolMR", "TPSA_norm", "MolWt", "HeavyAtomCount", "AromaticProportion"], 
-        n_keep=20,
     )
 
     # model training
@@ -364,9 +421,9 @@ if __name__ == "__main__":
         sisso_df,
         use_gpu=True,
         operators=["+", "-", "*", "/", "pow(2)", "log", "sqrt"],
-        n_term=2,  # terms in final equation - could do a scree plot to determine this
+        n_term=4,  # terms in final equation - could do a scree plot to determine this
         initial_screening=None,  # done manually
-        n_expansion=2,  # hyperparameter, default 3
+        n_expansion=3,  # hyperparameter, default 3
         k=20,  # hyperparameter, default 20
     )
 
@@ -379,32 +436,34 @@ if __name__ == "__main__":
 
     # inference
     for f in ("biogen", "ochem"):
-        test_df = pd.read_csv(f + ".csv")
-        test_df = test_df[(test_df["logS"] < -3) & (test_df["logS"] > -7)].reset_index(drop=True)
-        test_df = test_df[test_df["SMILES"].map(lambda s: MolFromSmiles(s) is not None).to_list()]
-        train_smiles = set(map(CanonSmiles, df["SMILES"]))
-        _original_length = test_df.shape[0]
-        test_df = test_df[~test_df["SMILES"].map(CanonSmiles).isin(train_smiles)]
-        print(
-            f"Filtered {(_original_length - test_df.shape[0])} overlapping molecules from {f} test set."
-        )
+        for full in (True, False):
+            if not full and f == "biogen":  # biogen already bounded
+                continue
+            test_df = pd.read_csv(f + ".csv")
+            if not full:
+                test_df = test_df[(test_df["logS"] < -3) & (test_df["logS"] > -7)].reset_index(drop=True)
+            test_df = test_df[test_df["SMILES"].map(lambda s: MolFromSmiles(s) is not None).to_list()]
+            train_smiles = set(map(CanonSmiles, df["SMILES"]))
+            _original_length = test_df.shape[0]
+            test_df = test_df[~test_df["SMILES"].map(CanonSmiles).isin(train_smiles)]
+            print(
+                f"Filtered {(_original_length - test_df.shape[0])} overlapping molecules from {f} test set."
+            )
 
-        # esol
-        y_pred = esol_predict(test_df)
-        parity_plot(test_df.loc[y_pred.index, "logS"], y_pred, f"esol_{f}_parity")
+            # esol
+            y_pred = esol_predict(test_df)
+            parity_plot(test_df.loc[y_pred.index, "logS"], y_pred, f"results/esol_{f}{'_full' if full else ''}_parity")
 
-        # sisso
-        smiles = test_df["SMILES"].to_list()
-        logs = test_df["logS"].to_list()
-        test_features = pd.DataFrame(columns=DESCRIPTORS, data=test_df["SMILES"].map(_f).to_list())
-        test_features.insert(0, "SMILES", smiles)
-        test_features.insert(1, "logS", logs)
-        for col in COUNT_DESCRIPTORS:
-            test_features[f"{col}_norm"] = test_features[col] / test_features["HeavyAtomCount"]
-        test_features = add_ap(test_features)
-        # sisso
-        test_pred = equation(test_features)
-        print(f"Clipping {(test_pred > -3).astype(int).sum() + (test_pred < -7).astype(int).sum()} predictions")
-        test_pred = test_pred.clip(min=-7, max=-3)
-        test_true = test_df["logS"].values
-        parity_plot(test_true, test_pred, f"sisso_{f}_parity")
+            # sisso
+            smiles = test_df["SMILES"].to_list()
+            logs = test_df["logS"].to_list()
+            test_features = pd.DataFrame(columns=DESCRIPTORS, data=test_df["SMILES"].map(_f).to_list())
+            test_features.insert(0, "SMILES", smiles)
+            test_features.insert(1, "logS", logs)
+            for col in COUNT_DESCRIPTORS:
+                test_features[f"{col}_norm"] = test_features[col] / test_features["HeavyAtomCount"]
+            test_features = add_ap(test_features)
+            # sisso
+            test_pred = equation(test_features)
+            test_true = test_df["logS"].values
+            parity_plot(test_true, test_pred, f"results/sisso_{f}{'_full' if full else ''}_parity")
