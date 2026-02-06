@@ -6,11 +6,7 @@ Download the training data from the ESOL paper SI.
 
 Download OChemUnseen from https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/CZVZIA
 
-This is perhaps the final equation:
-
-```
-FractionCSP3 - (exp((((MolLogP * 1.9045392) + -8.334743) - abs(VSA_EState9 * log(qed))) / Chi0v) * 5.45409)
-```
+Current version has this equation: -0.2978142347*(MolLogP+NumHeteroatoms_norm)   + 0.0040525405*(NumValenceElectrons-HeavyAtomMolWt)  -2.777767233245860
 
 python3.14 then `pip install torchsisso`
 
