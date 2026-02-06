@@ -4,7 +4,9 @@ from rdkit.Chem import CanonSmiles
 from main import parity_plot
 
 if __name__ == "__main__":
-    train_smiles = [CanonSmiles(smi) for smi in pd.read_csv("chemeleon_aqsoldbc_filtered_train.csv")["SMILES"]]
+    train_smiles = [
+        CanonSmiles(smi) for smi in pd.read_csv("chemeleon_aqsoldbc_filtered_train.csv")["SMILES"]
+    ]
     for f in ("biogen", "ochem"):
         true_df = pd.read_csv(f"{f}.csv")
         true_df = true_df[~true_df["SMILES"].isin(train_smiles)]

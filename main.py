@@ -1,15 +1,11 @@
-import numpy as np
-import pandas as pd
-from scipy.stats import pearsonr
-
-import sympy as sp
-
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_absolute_error
-
+import pandas as pd
+import sympy as sp
 from rdkit.Chem import MolFromSmiles
 from rdkit.ML.Descriptors import MoleculeDescriptors
+from scipy.stats import pearsonr
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 from esol import fit_esol
 
@@ -136,22 +132,18 @@ DESCRIPTORS = [
     "fr_unbrch_alkane",
     "fr_urea",
 ]
-COUNT_DESCRIPTORS = [c for c in DESCRIPTORS if c.startswith("fr_") or c.startswith("Num")] + ["TPSA"]
+COUNT_DESCRIPTORS = [c for c in DESCRIPTORS if c.startswith("fr_") or c.startswith("Num")] + [
+    "TPSA"
+]
 CALCULATOR = MoleculeDescriptors.MolecularDescriptorCalculator(DESCRIPTORS)
 
+import numpy as np
+import pandas as pd
 from rdkit import Chem
-
-import pandas as pd
-import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import StandardScaler
 
-import pandas as pd
-import numpy as np
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import StandardScaler
 
 def cluster_and_downsample(df, max_k=10, samples_per_cluster=50):
     """
@@ -160,36 +152,37 @@ def cluster_and_downsample(df, max_k=10, samples_per_cluster=50):
     """
     # 1. Separate target and features
     # We assume the first column is the SMILES and the second is target
-    features = df.iloc[:, 2:] 
-    
+    features = df.iloc[:, 2:]
+
     # 2. Preprocessing: Scale only the features
     scaler = StandardScaler()
     scaled_features = scaler.fit_transform(features)
-    
+
     best_k = 2
     best_score = -1
-    
+
     # 3. Identify ideal number of clusters (Silhouette Score)
     for k in range(2, max_k + 1):
-        kmeans = KMeans(n_clusters=k, n_init='auto', random_state=42)
+        kmeans = KMeans(n_clusters=k, n_init="auto", random_state=42)
         labels = kmeans.fit_predict(scaled_features)
         score = silhouette_score(scaled_features, labels)
-        
+
         if score > best_score:
             best_score = score
             best_k = k
-            
+
     print(f"Optimal clusters found: {best_k} (Silhouette Score: {best_score:.3f})")
-    
+
     # 4. Apply optimal clustering and add label back to the original full DF
-    final_kmeans = KMeans(n_clusters=best_k, n_init='auto', random_state=42)
-    df['_cluster_label'] = final_kmeans.fit_predict(scaled_features)
-    
+    final_kmeans = KMeans(n_clusters=best_k, n_init="auto", random_state=42)
+    df["_cluster_label"] = final_kmeans.fit_predict(scaled_features)
+
     # 5. Downsample the original dataframe (containing the target)
-    downsampled_df = df.groupby('_cluster_label', group_keys=False).apply(
+    downsampled_df = df.groupby("_cluster_label", group_keys=False).apply(
         lambda x: x.sample(min(len(x), samples_per_cluster), random_state=42)
     )
     return downsampled_df.reset_index(drop=True)
+
 
 def add_ap(df):
     aromatic_query = Chem.MolFromSmarts("a")
@@ -220,17 +213,12 @@ def parity_plot(y_true, y_pred, outname):
     # Create plot
     plt.figure(figsize=(6, 6))
 
-    hb = plt.hexbin(
-        y_true,
-        y_pred,
-        gridsize=50,
-        mincnt=1,
-    )
+    hb = plt.hexbin(y_true, y_pred, gridsize=50, mincnt=1,)
     cb = plt.colorbar(
         hb,
         fraction=0.04,  # width relative to axes
-        pad=0.02,       # gap between plot and colorbar
-        shrink=0.85,     # height scaling
+        pad=0.02,  # gap between plot and colorbar
+        shrink=0.85,  # height scaling
     )
     cb.set_label("# of Compounds", fontsize=11)
 
@@ -247,11 +235,7 @@ def parity_plot(y_true, y_pred, outname):
     plt.title("Parity Plot", fontsize=14)
 
     # Annotation with statistics
-    stats_text = (
-        f"$r$ = {r:.3f}\n"
-        f"RMSE = {rmse:.3f}\n"
-        f"MAE = {mae:.3f}"
-    )
+    stats_text = f"$r$ = {r:.3f}\n" f"RMSE = {rmse:.3f}\n" f"MAE = {mae:.3f}"
     plt.text(
         0.05,
         0.95,
@@ -269,7 +253,9 @@ def parity_plot(y_true, y_pred, outname):
     plt.tight_layout()
     plt.savefig(f"{outname}.png", dpi=300)
 
+
 from sklearn.ensemble import RandomForestRegressor
+
 
 def robust_screen_features(df, target_col, force_include=None, n_keep=20):
     """
@@ -278,20 +264,22 @@ def robust_screen_features(df, target_col, force_include=None, n_keep=20):
     """
     if force_include is None:
         force_include = []
-    
+
     # 1. Separate "forced" features from "candidate" features
     # Ensure forced features actually exist in the dataframe
     valid_force = [f for f in force_include if f in df.columns]
     missing = set(force_include) - set(valid_force)
     if missing:
         print(f"Warning: Forced features not found in DF: {missing}")
-        
+
     # Candidates are everything else (excluding target and forced)
     candidates = [c for c in df.columns if c != target_col and c not in valid_force]
-    
+
     # 2. If we already have few enough candidates, just return
     if len(candidates) + len(valid_force) <= n_keep:
-        print(f"Feature count ({len(candidates) + len(valid_force)}) is below limit ({n_keep}). No screening needed.")
+        print(
+            f"Feature count ({len(candidates) + len(valid_force)}) is below limit ({n_keep}). No screening needed."
+        )
         return df[valid_force + candidates + [target_col]]
 
     print(f"Screening {len(candidates)} candidate features with Random Forest...")
@@ -300,10 +288,10 @@ def robust_screen_features(df, target_col, force_include=None, n_keep=20):
     # We use a lightweight forest (100 trees) to gauge importance
     X = df[candidates]
     y = df[target_col]
-    
+
     rf = RandomForestRegressor(n_estimators=100, n_jobs=-1, random_state=42, verbose=1)
     rf.fit(X, y)
-    
+
     # 4. Select top features to fill the remaining slots
     slots_remaining = n_keep - len(valid_force)
     if slots_remaining <= 0:
@@ -312,17 +300,18 @@ def robust_screen_features(df, target_col, force_include=None, n_keep=20):
     else:
         # Get feature importances and sort indices
         importances = rf.feature_importances_
-        indices = np.argsort(importances)[::-1] # Descending order
+        indices = np.argsort(importances)[::-1]  # Descending order
         top_indices = indices[:slots_remaining]
         selected_candidates = [candidates[i] for i in top_indices]
-        
+
         print(f"Selected top {len(selected_candidates)} candidates via RF Importance:")
         for i in range(slots_remaining):
             print(f" - {selected_candidates[i]} (Imp: {importances[indices[i]]:.4f})")
 
     # 5. Reconstruct DataFrame with Forced + Selected features (target goes first for SISSO)
-    final_cols =  [target_col] + valid_force + selected_candidates
+    final_cols = [target_col] + valid_force + selected_candidates
     return df[final_cols]
+
 
 def sympy_df_function(expr_str: str):
     # Parse expression
@@ -349,15 +338,11 @@ def sympy_df_function(expr_str: str):
 
 
 if __name__ == "__main__":
-    import pandas as pd
     from rdkit.Chem import CanonSmiles
-
     from TorchSisso import SissoModel
-    import numpy as np
-    import pandas as pd
 
     # data loading
-    df = pd.read_csv("aqsoldbc.csv")
+    df = pd.read_csv("data/aqsoldbc.csv")
     print(f"Original dataframe has {df.shape[0]} entries")
 
     # bound to -7 and -3 for applications to drug discovery
@@ -380,7 +365,7 @@ if __name__ == "__main__":
     df = df[lipinski].reset_index(drop=True)
     print(f"Removing Rule of 5 Violators Reduced to {df.shape[0]} entries")
 
-    df[["SMILES", "logS"]].to_csv("chemeleon_aqsoldbc_filtered_train.csv", index=False)
+    df[["SMILES", "logS"]].to_csv("data/chemeleon_aqsoldbc_filtered_train.csv", index=False)
 
     # feature engineering - convert discrete into density, add AP
     for col in COUNT_DESCRIPTORS:
@@ -388,32 +373,34 @@ if __name__ == "__main__":
     df = add_ap(df)
 
     # baseline: ESOL
-    esol_predict, esol_result = fit_esol(
-        df,
-        smiles_col="SMILES",
-        target_col="logS",
-    )
+    esol_predict, esol_result = fit_esol(df, smiles_col="SMILES", target_col="logS",)
     print(esol_result)
     y_pred = esol_predict(df)
     parity_plot(df.loc[y_pred.index, "logS"], y_pred, "esol_train_parity")
 
     # our implementation of feature initial_screening
     df = robust_screen_features(
-        df, 
-        target_col="logS", 
-        force_include=["SMILES", "MolLogP", "MolMR", "TPSA_norm", "MolWt", "HeavyAtomCount", "AromaticProportion"], 
+        df,
+        target_col="logS",
+        force_include=[
+            "SMILES",
+            "MolLogP",
+            "MolMR",
+            "TPSA_norm",
+            "MolWt",
+            "HeavyAtomCount",
+            "AromaticProportion",
+        ],
         n_keep=15 + 1,  # +1 for SMILES
     )
 
     # clustering-based downsampling
-    df = df[['SMILES'] + [col for col in df.columns if col != 'SMILES']]  # ensure SMILES is first
+    df = df[["SMILES"] + [col for col in df.columns if col != "SMILES"]]  # ensure SMILES is first
     df = cluster_and_downsample(df, max_k=10, samples_per_cluster=50)
     print(f"After cluster-based downsampling, dataset has {df.shape[0]} rows")
 
     # SISSO treats first column as target, remainder as features
-    sisso_df = df.drop(
-        columns="SMILES"
-    )
+    sisso_df = df.drop(columns="SMILES")
 
     # model training
     # see: https://github.com/PaulsonLab/TorchSISSO/blob/main/README.md#installation
@@ -439,10 +426,14 @@ if __name__ == "__main__":
         for full in (True, False):
             if not full and f == "biogen":  # biogen already bounded
                 continue
-            test_df = pd.read_csv(f + ".csv")
+            test_df = pd.read_csv(f"data/{f}.csv")
             if not full:
-                test_df = test_df[(test_df["logS"] < -3) & (test_df["logS"] > -7)].reset_index(drop=True)
-            test_df = test_df[test_df["SMILES"].map(lambda s: MolFromSmiles(s) is not None).to_list()]
+                test_df = test_df[(test_df["logS"] < -3) & (test_df["logS"] > -7)].reset_index(
+                    drop=True
+                )
+            test_df = test_df[
+                test_df["SMILES"].map(lambda s: MolFromSmiles(s) is not None).to_list()
+            ]
             train_smiles = set(map(CanonSmiles, df["SMILES"]))
             _original_length = test_df.shape[0]
             test_df = test_df[~test_df["SMILES"].map(CanonSmiles).isin(train_smiles)]
@@ -452,12 +443,18 @@ if __name__ == "__main__":
 
             # esol
             y_pred = esol_predict(test_df)
-            parity_plot(test_df.loc[y_pred.index, "logS"], y_pred, f"results/esol_{f}{'_full' if full else ''}_parity")
+            parity_plot(
+                test_df.loc[y_pred.index, "logS"],
+                y_pred,
+                f"results/esol_{f}{'_full' if full else ''}_parity",
+            )
 
             # sisso
             smiles = test_df["SMILES"].to_list()
             logs = test_df["logS"].to_list()
-            test_features = pd.DataFrame(columns=DESCRIPTORS, data=test_df["SMILES"].map(_f).to_list())
+            test_features = pd.DataFrame(
+                columns=DESCRIPTORS, data=test_df["SMILES"].map(_f).to_list()
+            )
             test_features.insert(0, "SMILES", smiles)
             test_features.insert(1, "logS", logs)
             for col in COUNT_DESCRIPTORS:
@@ -473,4 +470,6 @@ if __name__ == "__main__":
                     print(test_features.iloc[i, :])
                     test_pred[i] = nan_guess
             test_true = test_df["logS"].values
-            parity_plot(test_true, test_pred, f"results/sisso_{f}{'_full' if full else ''}_parity")
+            parity_plot(
+                test_true, test_pred, f"results/sisso_{f}{'_full' if full else ''}_parity",
+            )

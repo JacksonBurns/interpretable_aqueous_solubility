@@ -1,11 +1,12 @@
-from rdkit import Chem
-from rdkit.Chem import Descriptors, Crippen, Lipinski
-import pandas as pd
-import numpy as np
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, mean_absolute_error
-from scipy.stats import pearsonr
 from dataclasses import dataclass
+
+import numpy as np
+import pandas as pd
+from rdkit import Chem
+from rdkit.Chem import Crippen, Descriptors, Lipinski
+from scipy.stats import pearsonr
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
 @dataclass
@@ -19,9 +20,7 @@ class ESOLFitResult:
 
 
 def fit_esol(
-    df: pd.DataFrame,
-    smiles_col: str = "SMILES",
-    target_col: str = "logS",
+    df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str = "logS",
 ):
     """
     Fit an ESOL-style linear model using RDKit descriptors.
@@ -89,12 +88,7 @@ def fit_esol(
     )
 
     def predictor(df_new: pd.DataFrame):
-        desc_new = (
-            df_new[smiles_col]
-            .map(calc_descriptors)
-            .dropna()
-            .apply(pd.Series)
-        )
+        desc_new = df_new[smiles_col].map(calc_descriptors).dropna().apply(pd.Series)
         X_new = desc_new[feature_names].values
         y_hat = model.intercept_ + X_new @ model.coef_
         return pd.Series(y_hat, index=desc_new.index)
