@@ -339,7 +339,7 @@ def sympy_df_function(expr_str: str):
 
 if __name__ == "__main__":
     from rdkit.Chem import CanonSmiles
-    from TorchSisso import SissoModel
+    # from TorchSisso import SissoModel
 
     # data loading
     df = pd.read_csv("data/aqsoldbc.csv")
