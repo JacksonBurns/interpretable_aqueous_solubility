@@ -40,9 +40,9 @@ from fractions import Fraction
 
 import math
 
-from DimensionalRegressor import Regressor 
+from .DimensionalRegressor import Regressor 
 
-from pareto_new import pareto
+from .pareto_new import pareto
 
 class feature_space_construction:
     

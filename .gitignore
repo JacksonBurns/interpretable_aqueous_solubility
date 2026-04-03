@@ -3,4 +3,5 @@ screen.log
 .vscode
 __pycache__
 # training output files
-chemeleon_results
+chemeleon_training
+

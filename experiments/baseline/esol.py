@@ -18,6 +18,23 @@ class ESOLFitResult:
     r: float
     feature_names: list
 
+    def __repr__(self):
+        terms = []
+        for i, (name, coeff) in enumerate(self.coefficients.items()):
+            if i == 0:
+                # First term: no leading space, keep negative sign if present
+                term = f"{coeff:.3e}*{name}"
+            else:
+                # Subsequent terms: explicit sign with spacing
+                sign = "+ " if coeff >= 0 else "- "
+                term = f"{sign}{abs(coeff):.3e}*{name}"
+            terms.append(term)
+        
+        equation = " ".join(terms)
+        intercept_sign = "+ " if self.intercept >= 0 else "- "
+        
+        return f"logS = {equation} {intercept_sign}{abs(self.intercept):.3e}"
+
 
 def fit_esol(
     df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str = "logS",

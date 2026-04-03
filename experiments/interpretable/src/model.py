@@ -8,9 +8,9 @@ Created on Wed May 17 09:22:50 2023
 """
 
 
-import FeatureSpaceConstruction as fcc
+from . import FeatureSpaceConstruction as fcc
 
-import DimensionalFeatureSpaceConstruction as dfcc
+from . import DimensionalFeatureSpaceConstruction as dfcc
 
 
 
