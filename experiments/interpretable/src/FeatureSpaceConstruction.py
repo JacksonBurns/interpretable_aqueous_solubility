@@ -27,9 +27,9 @@ import pdb
 
 from fractions import Fraction
 
-from pareto_new import pareto
+from .pareto_new import pareto
 
-from Regressor import Regressor
+from .Regressor import Regressor
 
 
 class feature_space_construction:
@@ -1181,7 +1181,7 @@ class feature_space_construction:
         
         #if self.disp: print('############################################################# Implementing Automatic Expansion and construction of sparse models..!!! ######################################################################')
         
-        from Regressor import Regressor
+        from .Regressor import Regressor
         
         i = 1
         
@@ -1522,15 +1522,9 @@ class feature_space_construction:
                 print('Expanded feature space is::',self.df_feature_values.shape[1])
                 
                 
-                print('!!Warning:: Further feature expansions result in memory consumption, Please provide the input to consider feature expansion or to exit the run with the sparse models created!!!')
+                print('!!Warning:: Further feature expansions result in memory consumption - abandoning generation!')
                 
-                response = input("Do you wish to continue (yes/no)? ").strip().lower()
-                
-                if response == 'no' or response == 'n': 
-                    
-                    print("Exiting based on user input.")
-                    
-                    break
+                break
             i = i+1
 
 
