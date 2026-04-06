@@ -9,15 +9,21 @@ from rdkit.ML.Descriptors import MoleculeDescriptors
 from rdkit.Chem import MolFromSmiles, Descriptors
 
 
-def _add_features(df: pd.DataFrame, smiles_col: str = "SMILES", feature_set: Literal["rdkit", "mordred"] = "rdkit", means: np.ndarray | None = None):
+def _add_features(df: pd.DataFrame, smiles_col: str = "SMILES", feature_set: Literal["rdkit", "mordred"] = "mordred", means: np.ndarray | None = None):
     if feature_set == "mordred":
         calc = Calculator(descriptors, ignore_3D=True)
         descs = calc.pandas(mols=[MolFromSmiles(s) for s in df[smiles_col]]).fill_missing()
+        # retain only Only alphanumeric characters, numbers, and underscores in column names for compatibility with PySR
+        descs.columns = [re.sub(r'[^\w]+', '_', col) for col in descs.columns]
+        # suffix with _mordred to avoid conflicts with julia vars
+        descs.columns = [col + "_mordred" for col in descs.columns]
     else:
         names = [x[0] for x in Descriptors._descList]
         calc = MoleculeDescriptors.MolecularDescriptorCalculator(names)
         data = [calc.CalcDescriptors(MolFromSmiles(smiles)) for smiles in df[smiles_col]]
         descs = pd.DataFrame(columns=calc.GetDescriptorNames(), data=data)
+    # drop columns with zero variance
+    descs = descs.loc[:, descs.nunique() > 1]
     # imputation
     descs = descs.astype(float)
     descs = descs.replace([np.inf, -np.inf], np.nan)
