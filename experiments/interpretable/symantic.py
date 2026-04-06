@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestRegressor
 
 import re
 
-OPERATORS = ['+', '-', '*', '/']
+OPERATORS = ['+', '-', '*']
 
 
 def _add_features(df: pd.DataFrame, smiles_col: str = "SMILES", feature_set: Literal["rdkit", "mordred"] = "rdkit", means: np.ndarray | None = None):
