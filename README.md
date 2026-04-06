@@ -49,7 +49,7 @@ seaborn
 ### Execution
 
 First run `experiments/fit.py` to actually fit the models.
-With a consumer grade GPU for `CheMeleon` and sufficient memory for `SyMANTIC`, this should take 5-10 minutes.
+With a consumer grade GPU for `CheMeleon` and sufficient memory for `SyMANTIC`, this should take 5-10 minutes using the RDKit descriptors or ~30 minutes with the `mordred` descriptors.
 At the end, `biogen_pred.csv` and `ochem_pred.csv`, containing the predictions for the models, will be written to disk.
 
 After that, execute `experiments/analyze.py` to generate parity plots and the final comparison statistics for all of the models.
@@ -65,8 +65,8 @@ If you change anything about the data preparation, training, etc. you will need 
 These are the final interpretable equations learned by `SyMANTIC`, ESOL, and PySR:
 
 ```
-SyMANTIC equation: -0.828985136332897*MolLogP + -0.04519306838350487*VSA_EState2 + 0.0023226668291721803*(MolLogP*TPSA) - 0.6658466441642306
-PySR equation: -0.609409521009072*(AvgIpc + MolLogP)
+SyMANTIC equation: -0.5347262465012509*SLogP + -0.1799533893363286*SddssS + 5.194310463365847*RNCG - 3.438930181858421
+PySR equation: NddssS - (AATS4d - (-0.48176691652585907)*SLogP)
 ESOL refitted equation: logS = -6.640e-05*mw - 6.265e-01*logp + 9.637e-03*rotors - 1.087e+00*ap - 1.037e+00
 ```
 
