@@ -42,7 +42,7 @@ if __name__ == "__main__":
     f_symantic_gp, _ = fit_residual_gp(symantic_aqsoldbc_features, train_df["logS"], symantic_aqsoldbc_pred)
     biogen_df["symanticgp_pred"], _ = f_symantic_gp(symantic_biogen_features, biogen_df["symantic_pred"])
     ochem_df["symanticgp_pred"], _ = f_symantic_gp(symantic_ochem_features, ochem_df["symantic_pred"])
-    
+'''
     # pysr
     f_pysr, pysr_eqn = fit_pysr(train_df.copy())
     print("PySR equation:", pysr_eqn)
@@ -76,3 +76,4 @@ if __name__ == "__main__":
     print(biogen_df)
     ochem_df.to_csv("ochem_pred.csv", index=False)
     biogen_df.to_csv("biogen_pred.csv", index=False)
+'''
