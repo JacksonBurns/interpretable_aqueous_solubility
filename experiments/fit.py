@@ -32,7 +32,11 @@ if __name__ == "__main__":
     # training and inference
 
     # symantic
-    f_symantic, symantic_eqn = fit_symantic(train_df.copy())
+    # known equation provided from run on machine with ~256 GB of memory - to run from scratch on a machine with less memory, use downsample_size and remove known_equation argument
+    f_symantic, symantic_eqn = fit_symantic(
+        train_df.copy(),
+        known_equation="-0.6003928258092548*MolLogP + -0.04756373294915526*(VSA_EState2-SlogP_VSA3) + -0.015857245648477243*EState_VSA8 - 1.0133415331784956",
+    )
     print("SyMANTIC equation:", symantic_eqn)
     biogen_df["symantic_pred"], symantic_biogen_features = f_symantic(biogen_df)
     ochem_df["symantic_pred"], symantic_ochem_features = f_symantic(ochem_df)
@@ -42,7 +46,7 @@ if __name__ == "__main__":
     f_symantic_gp, _ = fit_residual_gp(symantic_aqsoldbc_features, train_df["logS"], symantic_aqsoldbc_pred)
     biogen_df["symanticgp_pred"], _ = f_symantic_gp(symantic_biogen_features, biogen_df["symantic_pred"])
     ochem_df["symanticgp_pred"], _ = f_symantic_gp(symantic_ochem_features, ochem_df["symantic_pred"])
-'''
+
     # pysr
     f_pysr, pysr_eqn = fit_pysr(train_df.copy())
     print("PySR equation:", pysr_eqn)
@@ -76,4 +80,3 @@ if __name__ == "__main__":
     print(biogen_df)
     ochem_df.to_csv("ochem_pred.csv", index=False)
     biogen_df.to_csv("biogen_pred.csv", index=False)
-'''

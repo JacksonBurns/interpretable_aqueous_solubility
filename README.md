@@ -65,7 +65,7 @@ If you change anything about the data preparation, training, etc. you will need 
 These are the final interpretable equations learned by `SyMANTIC`, ESOL, and PySR:
 
 ```
-SyMANTIC equation: -0.5959282804648204*MolLogP + -0.1317277521398083*Chi4n - 1.1763421407435743
+SyMANTIC equation: -0.828985136332897*MolLogP + -0.04519306838350487*VSA_EState2 + 0.0023226668291721803*(MolLogP*TPSA) - 0.6658466441642306
 PySR equation: -0.609409521009072*(AvgIpc + MolLogP)
 ESOL refitted equation: logS = -6.640e-05*mw - 6.265e-01*logp + 9.637e-03*rotors - 1.087e+00*ap - 1.037e+00
 ```
