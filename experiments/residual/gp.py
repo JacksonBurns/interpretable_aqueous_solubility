@@ -1,5 +1,5 @@
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel, WhiteKernel
+from sklearn.gaussian_process.kernels import ConstantKernel, Matern, WhiteKernel
 import pandas as pd
 import numpy as np
 
@@ -19,9 +19,16 @@ def fit_residual_gp(X_train: pd.DataFrame, y_true: pd.Series, y_pred_base: pd.Se
     # residuals
     residuals = y_true - y_pred_base
     
-    # Standard kernel setup for regression on residuals
-    kernel = ConstantKernel(1.0) * RBF(length_scale=1.0) + WhiteKernel(noise_level=0.1)
-    gp = GaussianProcessRegressor(kernel=kernel, normalize_y=True, random_state=42)
+    # matern kernel with noise term
+    kernel = ConstantKernel(1.0) * Matern(
+        length_scale=np.ones(X_train.shape[1]),
+        nu=2.5
+    ) + WhiteKernel(noise_level=1e-6)
+    gp = GaussianProcessRegressor(
+        kernel=kernel,
+        normalize_y=False,
+        random_state=42,
+    )
     
     # Fit the GP
     gp.fit(X_train.values, residuals.values)
