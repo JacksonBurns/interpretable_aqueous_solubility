@@ -65,8 +65,8 @@ If you change anything about the data preparation, training, etc. you will need 
 These are the final interpretable equations learned by `SyMANTIC`, ESOL, and PySR:
 
 ```
-SyMANTIC equation: -0.5347262465012509*SLogP + -0.1799533893363286*SddssS + 5.194310463365847*RNCG - 3.438930181858421
-PySR equation: NddssS - (AATS4d - (-0.48176691652585907)*SLogP)
+SyMANTIC equation: 0.0367*((MolLogP*LabuteASA)/(MolLogP-Chi0v)) + 499.497*((Chi0v+Chi0n)/(LabuteASA)**2) -2.863
+PySR equation: (BCUT2D_CHGLO - MolLogP)/1.5725921487066359
 ESOL refitted equation: logS = -6.640e-05*mw - 6.265e-01*logp + 9.637e-03*rotors - 1.087e+00*ap - 1.037e+00
 ```
 

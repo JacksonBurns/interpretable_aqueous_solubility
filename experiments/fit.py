@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # known equation provided from run on machine with ~256 GB of memory - to run from scratch on a machine with less memory, use downsample_size and remove known_equation argument
     f_symantic, symantic_eqn = fit_symantic(
         train_df.copy(),
-        known_equation="-0.5347262465012509*SLogP + -0.1799533893363286*SddssS + 5.194310463365847*RNCG - 3.438930181858421",
+        known_equation="0.0367*((MolLogP*LabuteASA)/(MolLogP-Chi0v)) + 499.497*((Chi0v+Chi0n)/(LabuteASA)**2) -2.863",
     )
     print("SyMANTIC equation:", symantic_eqn)
     biogen_df["symantic_pred"], symantic_biogen_features = f_symantic(biogen_df)
