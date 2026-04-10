@@ -63,12 +63,19 @@ def fit_pysr(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str = "lo
     model.fit(input_df, df[target_col])
     
     # Extract the best equation as a string (sympy representation)
-    eqn = str(model.sympy())
+    utopia_eqn = str(model.sympy())
+    # extract the absolute lowest error, least interpretable
+    greedy_eqn = str(model.get_best(model.get_best_index("loss")))
 
-    features_in_eqn = list(set(re.findall(r'[a-zA-Z_]\w*', eqn)))
+    features_in_utopia_eqn = list(set(re.findall(r'[a-zA-Z_]\w*', utopia_eqn)))
+    features_in_greedy_eqn = list(set(re.findall(r'[a-zA-Z_]\w*', greedy_eqn)))
 
-    def predictor(df_new: pd.DataFrame):
+    def utopia_predictor(df_new: pd.DataFrame):
         df_new_features, _ = _add_features(df_new, smiles_col, means=means)        
-        return df_new_features.eval(eqn), df_new_features[features_in_eqn]
+        return df_new_features.eval(utopia_eqn), df_new_features[features_in_utopia_eqn]
 
-    return predictor, eqn
+    def greedy_predictor(df_new: pd.DataFrame):
+        df_new_features, _ = _add_features(df_new, smiles_col, means=means)
+        return df_new_features.eval(greedy_eqn), df_new_features[features_in_greedy_eqn]
+
+    return (utopia_predictor, greedy_predictor), (utopia_eqn, greedy_eqn)
