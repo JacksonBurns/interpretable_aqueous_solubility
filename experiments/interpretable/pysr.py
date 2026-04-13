@@ -22,12 +22,12 @@ def _add_features(df: pd.DataFrame, smiles_col: str = "SMILES", feature_set: Lit
         calc = MoleculeDescriptors.MolecularDescriptorCalculator(names)
         data = [calc.CalcDescriptors(MolFromSmiles(smiles)) for smiles in df[smiles_col]]
         descs = pd.DataFrame(columns=calc.GetDescriptorNames(), data=data)
-    # drop columns with zero variance
-    descs = descs.loc[:, descs.nunique() > 1]
     # imputation
     descs = descs.astype(float)
     descs = descs.replace([np.inf, -np.inf], np.nan)
     if means is None:
+        # drop columns with zero variance (do this only when scaling for the first time)
+        descs = descs.loc[:, descs.nunique() > 1]
         means = descs.mean(axis=0, skipna=True)
     descs = descs.fillna(means)
     return descs, means
@@ -43,8 +43,7 @@ def fit_pysr(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str = "lo
         niterations=50,  
         populations=30,  
         population_size=100,  
-        binary_operators=["+", "-", "*", "/"],  
-        unary_operators=["sqrt", "log"],  
+        binary_operators=["+", "-", "*", "/"],
         loss="L2DistLoss()",  
         parsimony=0.002,  
         maxsize=20,  
@@ -59,23 +58,39 @@ def fit_pysr(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str = "lo
         verbosity=1,
         temp_equation_file=True,
     )
-
     model.fit(input_df, df[target_col])
-    
-    # Extract the best equation as a string (sympy representation)
     utopia_eqn = str(model.sympy())
     # extract the absolute lowest error, least interpretable
-    greedy_eqn = str(model.get_best(model.get_best_index("loss")))
 
-    features_in_utopia_eqn = list(set(re.findall(r'[a-zA-Z_]\w*', utopia_eqn)))
-    features_in_greedy_eqn = list(set(re.findall(r'[a-zA-Z_]\w*', greedy_eqn)))
+    model = PySRRegressor(
+        model_selection='accuracy',  # damn the interpretability, full steam ahead
+        niterations=50,  
+        populations=30,  
+        population_size=100,  
+        binary_operators=["+", "-", "*", "/"],
+        loss="L2DistLoss()",  
+        parsimony=0.002,  
+        maxsize=20,  
+        maxdepth=10,  
+        turbo=True,  
+        bumper=True,  
+        precision=64,  
+        random_state=42,
+        parallelism='serial',
+        deterministic=True,
+        progress=True,
+        verbosity=1,
+        temp_equation_file=True,
+    )
+    model.fit(input_df, df[target_col])
+    greedy_eqn = str(model.sympy())
 
     def utopia_predictor(df_new: pd.DataFrame):
         df_new_features, _ = _add_features(df_new, smiles_col, means=means)        
-        return df_new_features.eval(utopia_eqn), df_new_features[features_in_utopia_eqn]
+        return df_new_features.eval(utopia_eqn)
 
     def greedy_predictor(df_new: pd.DataFrame):
         df_new_features, _ = _add_features(df_new, smiles_col, means=means)
-        return df_new_features.eval(greedy_eqn), df_new_features[features_in_greedy_eqn]
+        return df_new_features.eval(greedy_eqn)
 
     return (utopia_predictor, greedy_predictor), (utopia_eqn, greedy_eqn)
