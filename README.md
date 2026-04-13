@@ -44,6 +44,7 @@ chemprop
 pysr
 ipykernel
 seaborn
+statsmodels
 ```
 
 ### Execution
@@ -65,9 +66,19 @@ If you change anything about the data preparation, training, etc. you will need 
 These are the final interpretable equations learned by `SyMANTIC`, ESOL, and PySR:
 
 ```
-SyMANTIC equation: 0.0367*((MolLogP*LabuteASA)/(MolLogP-Chi0v)) + 499.497*((Chi0v+Chi0n)/(LabuteASA)**2) -2.863
-PySR equation: (BCUT2D_CHGLO - MolLogP)/1.5725921487066359
+
+Downsample size: 2815, Repetition: 1
+PySR utopia equation: -0.6258959106197134*(AvgIpc + MolLogP)
+PySR greedy equation: -AvgIpc*MaxPartialCharge + FpDensityMorgan1 + MolLogP*(MaxAbsPartialCharge - 0.9315775367155461) + fr_hdrzone - fr_nitro - (BCUT2D_LOGPHI + fr_Nhpyrrole)
+
+Downsample size: 2815, Repetition: 1
+SyMANTIC utopia equation: -0.6393026684206614*MolLogP + -0.0391539240305631*(VSA_EState9+VSA_EState2) - 0.9344308361212934
+SyMANTIC greedy equation: -1.1061596089237795*((MolLogP+MaxAbsPartialCharge)+(MolLogP*MinPartialCharge)) + -0.041048632214286764*((VSA_EState9+VSA_EState2)-(HallKierAlpha-VSA_EState9)) - 0.3142127600353626
+
+Downsample size: 2815, Repetition: 1
 ESOL refitted equation: logS = -6.640e-05*mw - 6.265e-01*logp + 9.637e-03*rotors - 1.087e+00*ap - 1.037e+00
+
+
 ```
 
 Results are included in the `results` directory, including a simultaneous model comparison and parity plots for individual models.
