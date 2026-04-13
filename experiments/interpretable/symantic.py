@@ -30,7 +30,7 @@ def _add_features(df: pd.DataFrame, smiles_col: str = "SMILES", feature_set: Lit
     descs = descs.fillna(means)
     return pd.concat((df, descs), axis=1), means
 
-def fit_symantic(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str = "logS", downsample_size: int = None, top_n_features: int | None = 20):
+def fit_symantic(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str = "logS", downsample_size: int = None, top_n_features: int | None = 10):
     input_df, means = _add_features(df, smiles_col)
     if downsample_size is not None and downsample_size > df.shape[0]:
         print(f"Downsample size {downsample_size} is larger than dataset size {df.shape[0]}, using full dataset instead.")
@@ -64,23 +64,19 @@ def fit_symantic(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str =
         disp=True,
         metrics=[0.05, 0.99],
         # initial_screening=['spearman', 0.95],  <-- skip, use RF-based instead
-        n_term=3,
-        sis_features=20,
+        n_term=2,
+        sis_features=5,
     )
     res, pareto = symantic.fit()
     utopia_eqn = res['utopia']['expression'].strip()
     greedy_eqn = pareto.Equation.tolist()[-1].strip()
 
-    # Only keep columns used in the equation
-    features_in_utopia_eqn = list(set(re.findall(r'[a-zA-Z_]\w*', utopia_eqn)))
-    features_in_greedy_eqn = list(set(re.findall(r'[a-zA-Z_]\w*', greedy_eqn)))
-
     def utopia_predictor(df_new: pd.DataFrame):
         df_new, _ = _add_features(df_new, smiles_col, means=means)
-        return df_new.eval(utopia_eqn), df_new[features_in_utopia_eqn]
+        return df_new.eval(utopia_eqn)
 
     def greedy_predictor(df_new: pd.DataFrame):
         df_new, _ = _add_features(df_new, smiles_col, means=means)
-        return df_new.eval(greedy_eqn), df_new[features_in_greedy_eqn]
+        return df_new.eval(greedy_eqn)
 
     return (utopia_predictor, greedy_predictor), (utopia_eqn, greedy_eqn)

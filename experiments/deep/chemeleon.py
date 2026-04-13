@@ -46,6 +46,6 @@ def fit_chemeleon(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str 
         y_hat = pd.read_csv(output_tempfile)[target_col].values
         output_tempfile.unlink()
         Path("temp_preds_individual.csv").unlink()
-        return pd.Series(y_hat, index=df_new.index), None
+        return pd.Series(y_hat, index=df_new.index)
 
     return predictor, None

@@ -1,0 +1,396 @@
+Downsample size: 10, Repetition: 1
+PySR utopia equation: (-1.1880230534160376 + RingCount/PEOE_VSA7)*(MinPartialCharge*(fr_benzene*(-2.8169884857787033) - (Kappa3 + NumAliphaticCarbocycles)) - 1*0.2811890266965544)
+PySR greedy equation: (MinPartialCharge*(-1.60312579739278 + RingCount/PEOE_VSA7)*(fr_benzene*(-2.733030529178753) - (Kappa3 + NumAliphaticCarbocycles)) - 1*(-0.4271247542214891))*0.7393824089526049
+
+Downsample size: 10, Repetition: 1
+SyMANTIC utopia equation: -0.06471730811617706*(MolLogP+PEOE_VSA6) + -0.01221035365729189*(SMR_VSA1/FractionCSP3) - 0.09819520229328083
+SyMANTIC greedy equation: -0.02166721577987747*((FpDensityMorgan2-FractionCSP3)*(MolLogP*PEOE_VSA6)) + -2653896905169971.5*((Chi3n/FractionCSP3)*(FractionCSP3/Chi3n)) + 2653896905169970.5
+
+Downsample size: 10, Repetition: 1
+ESOL refitted equation: logS = 1.444e-02*mw - 9.391e-01*logp - 5.327e-01*rotors - 2.367e+00*ap - 4.641e-01
+
+Downsample size: 10, Repetition: 2
+PySR utopia equation: -fr_ester + (-fr_halogen + (AvgIpc - 1*1.2478252431260255)*(-BCUT2D_CHGHI - BCUT2D_CHGHI + fr_NH2 + 2.719725425808683))*1.2278678618602117
+PySR greedy equation: -(fr_ester - 1*0.1213326710396191) + (-fr_halogen + (AvgIpc - 1*1.215452893944341)*(-BCUT2D_CHGHI - BCUT2D_CHGHI + fr_NH2 + 2.703512961956376))*1.2355267263261627
+
+Downsample size: 10, Repetition: 2
+SyMANTIC utopia equation: -0.08466481665970499*(PEOE_VSA7/FpDensityMorgan1) + 0.4322648307270209*(BCUT2D_LOGPLOW+Kappa3) - 0.73192136358904
+SyMANTIC greedy equation: 0.6344991905249305*((BCUT2D_LOGPLOW+SMR_VSA9)-(SMR_VSA9/FpDensityMorgan1)) + 2.5502069415437885*((Kappa3/FpDensityMorgan1)/(PEOE_VSA7+FpDensityMorgan1)) - 1.7764285921520768
+
+Downsample size: 10, Repetition: 2
+ESOL refitted equation: logS = -1.613e-03*mw - 6.162e-01*logp + 1.493e-01*rotors - 1.479e+00*ap - 1.020e+00
+
+Downsample size: 10, Repetition: 3
+PySR utopia equation: (-MaxPartialCharge + (MinPartialCharge + MolLogP + fr_prisulfonamd)*1.1967322509377636)*(-MaxPartialCharge + fr_phos_acid/0.7167263140951277 + fr_priamide - 0.9083390661695582)
+PySR greedy equation: (-MaxPartialCharge + (MinPartialCharge + MolLogP + fr_prisulfonamd)*1.1967322509377636)*(-MaxPartialCharge + fr_phos_acid/0.7167263140951277 + fr_priamide - 0.9083390661695582)
+
+Downsample size: 10, Repetition: 3
+SyMANTIC utopia equation: -0.02047420226277892*(MolLogP*SMR_VSA5) + 0.003811327624109668*(PEOE_VSA6*EState_VSA10) - 0.44834358264640617
+SyMANTIC greedy equation: -0.2228385802734534*((MolLogP*SMR_VSA5)/(BCUT2D_MWLOW+SMR_VSA10)) + -0.10188589481914204*((BCUT2D_MRHI+PEOE_VSA6)/(BCUT2D_LOGPHI-EState_VSA10)) - 0.3251293253965353
+
+Downsample size: 10, Repetition: 3
+ESOL refitted equation: logS = -3.396e-03*mw - 8.928e-01*logp + 3.173e-01*rotors + 1.618e+00*ap - 4.591e-01
+
+Downsample size: 10, Repetition: 4
+PySR utopia equation: (MinAbsEStateIndex + NumHeterocycles - (MolLogP - 0.7115425650080754*NumAliphaticCarbocycles)/1.0442370045401332 - (SMR_VSA2/2.1492066902570923 - 1*0.07436278643823545))/0.9638570836181924
+PySR greedy equation: (MinAbsEStateIndex + NumHeterocycles - (MolLogP - 0.7115425650080754*NumAliphaticCarbocycles)/1.0442370045401332 - (SMR_VSA2/2.1492066902570923 - 1*0.07436278643823545))/0.9638570836181924
+
+Downsample size: 10, Repetition: 4
+SyMANTIC utopia equation: -3.4609256557534076*(MinAbsPartialCharge*MolLogP) - 0.2252335186902008
+SyMANTIC greedy equation: -0.8679750905510651*(MolLogP+(MaxPartialCharge*BCUT2D_MWLOW)) + 3.003785005326911*((NOCount+EState_VSA7)/(TPSA+SMR_VSA7)) + 1.0683949779984183
+
+Downsample size: 10, Repetition: 4
+ESOL refitted equation: logS = -4.314e-03*mw - 7.173e-01*logp - 3.358e-02*rotors + 1.662e+00*ap + 4.578e-01
+
+Downsample size: 10, Repetition: 5
+PySR utopia equation: fr_ether - fr_nitrile - (-NumAliphaticCarbocycles + (EState_VSA4 + fr_C_O + fr_halogen)*0.21293562063708893/FpDensityMorgan2) - 1.400177046929526
+PySR greedy equation: fr_ether - fr_nitrile - (-NumAliphaticCarbocycles + (EState_VSA4 - FpDensityMorgan1 + fr_C_O + fr_halogen)*0.21218489681337277/FpDensityMorgan2) - 1.5498485796965857
+
+Downsample size: 10, Repetition: 5
+SyMANTIC utopia equation: -0.3445648038048716*(Kappa2-FpDensityMorgan1) - 1.4416556694697578
+SyMANTIC greedy equation: -0.3257000442368395*((PEOE_VSA6/BCUT2D_MWLOW)-(BCUT2D_MWLOW/Kappa2)) + -0.22313844977098077*((Kappa2-Phi)/(Kappa2-FpDensityMorgan3)) - 2.6817824341902883
+
+Downsample size: 10, Repetition: 5
+ESOL refitted equation: logS = 5.297e-04*mw + 5.644e-02*logp - 3.448e-01*rotors - 1.004e+00*ap - 1.552e+00
+
+Downsample size: 22, Repetition: 1
+PySR utopia equation: -NumAliphaticHeterocycles + (NumAmideBonds - fr_Nhpyrrole - fr_sulfonamd + (MolLogP/(-2.390142218688262) - NumAromaticCarbocycles)/1.4869958459821642)/0.5139146872125595
+PySR greedy equation: -NumAtomStereoCenters + (NumAmideBonds - fr_Nhpyrrole - fr_sulfonamd + (MolLogP/(-2.5261537560093825) - (NumAromaticCarbocycles - 1*0.38821366013702946))/1.3591450320646168)/0.48145245410628434
+
+Downsample size: 22, Repetition: 1
+SyMANTIC utopia equation: 1.6296731164231217*(MolLogP/BCUT2D_LOGPLOW) + -0.07993481662128783*(EState_VSA6/MolLogP) - 0.14100841547707033
+SyMANTIC greedy equation: -0.7458230524823584*((PEOE_VSA6+EState_VSA6)/(MolLogP+BCUT2D_MWLOW)) + -21.68141040093243*((Chi3n+BCUT2D_LOGPLOW)*(qed/BCUT2D_MWLOW)) - 0.41105514829632384
+
+Downsample size: 22, Repetition: 1
+ESOL refitted equation: logS = -1.088e-03*mw - 6.742e-01*logp + 4.804e-02*rotors - 1.952e+00*ap - 8.730e-02
+
+Downsample size: 22, Repetition: 2
+PySR utopia equation: -fr_phenol_noOrthoHbond + (1.6783778176612505 - (AvgIpc + (MolLogP - fr_methoxy)/AvgIpc))*(1.859861504072752 - fr_azo)
+PySR greedy equation: fr_COO2 - fr_phenol_noOrthoHbond + (1.711075324407643 - fr_azo)*(-AvgIpc + 1.0066191438620167 + (-MolLogP + fr_methoxy + 1.0102320802074227)/AvgIpc)
+
+Downsample size: 22, Repetition: 2
+SyMANTIC utopia equation: -0.6926302566474445*(MolLogP-BCUT2D_CHGLO) + 0.37683412084096124*(VSA_EState8/MolLogP) - 0.023003454761366893
+SyMANTIC greedy equation: 1.2783518819511885*((FpDensityMorgan1+BCUT2D_CHGLO)+(MolLogP/BCUT2D_CHGLO)) + 0.3289888302081008*((VSA_EState8-VSA_EState4)/(MolLogP-EState_VSA9)) - 0.24952298286984398
+
+Downsample size: 22, Repetition: 2
+ESOL refitted equation: logS = -2.905e-03*mw - 5.837e-01*logp + 1.240e-01*rotors - 9.039e-01*ap - 7.387e-01
+
+Downsample size: 22, Repetition: 3
+PySR utopia equation: fr_phos_acid + (MolLogP + NumHeterocycles + fr_ArN)*(-NumAliphaticHeterocycles - fr_SH - 2.1994860615761502/Kappa3)
+PySR greedy equation: fr_phos_acid + fr_phos_ester + fr_pyridine + (MolLogP + NumHeterocycles + fr_ArN)*(-NumAliphaticHeterocycles - fr_SH - 2.304969328978108/Kappa3)
+
+Downsample size: 22, Repetition: 3
+SyMANTIC utopia equation: -0.07145715872455738*(MaxEStateIndex*MolLogP) + 0.0851956569021485*(SlogP_VSA3-PEOE_VSA11) - 1.0090785603312653
+SyMANTIC greedy equation: 0.07424258621183936*((SlogP_VSA3-PEOE_VSA11)-(MaxEStateIndex*MolLogP)) + -1.3228086962149868e+16*((qed/BCUT2D_MWLOW)*(BCUT2D_MWLOW/qed)) + 1.322808696214987e+16
+
+Downsample size: 22, Repetition: 3
+ESOL refitted equation: logS = -4.736e-03*mw - 7.534e-01*logp + 4.472e-01*rotors - 5.816e-01*ap - 8.090e-01
+
+Downsample size: 22, Repetition: 4
+PySR utopia equation: Chi1n*(-0.7143160551173285) + NumHeterocycles + fr_aryl_methyl - (-1.572517832950056)*(fr_Al_OH + fr_para_hydroxylation)
+PySR greedy equation: NumHeterocycles + fr_amide + fr_para_hydroxylation + (Chi1n*0.4793321519176876 - fr_Al_OH + fr_aldehyde + fr_diazo - 1*0.2559090563525354)*(-1.5820955508670995)
+
+Downsample size: 22, Repetition: 4
+SyMANTIC utopia equation: -0.04995020184034662*(PEOE_VSA6+VSA_EState2) + -7.551270857908798*MinAbsPartialCharge + 0.32328613013467944
+SyMANTIC greedy equation: -0.007077554960177991*((PEOE_VSA6*MaxEStateIndex)-(MaxEStateIndex/MinAbsPartialCharge)) + 0.005639834784127287*((MaxEStateIndex/MaxPartialCharge)+(Chi3n/MolLogP)) - 1.768209026713723
+
+Downsample size: 22, Repetition: 4
+ESOL refitted equation: logS = -8.999e-03*mw - 3.726e-01*logp + 1.088e-01*rotors + 4.939e-01*ap - 1.314e-01
+
+Downsample size: 22, Repetition: 5
+PySR utopia equation: -qed + (BCUT2D_CHGHI*(FractionCSP3*(MinAbsEStateIndex - NumAmideBonds) - fr_para_hydroxylation) - VSA_EState5 - 3.059726235831722)/(FpDensityMorgan1 + NumAromaticHeterocycles)
+PySR greedy equation: -qed + (BCUT2D_CHGHI*(FractionCSP3*(MinAbsEStateIndex - NumAmideBonds) - fr_para_hydroxylation) - VSA_EState5 - 3.059726235831722)/(FpDensityMorgan1 + NumAromaticHeterocycles)
+
+Downsample size: 22, Repetition: 5
+SyMANTIC utopia equation: 0.021439326556887885*(PEOE_VSA6*BCUT2D_LOGPLOW) + -0.10617884914543509*VSA_EState6 - 1.3663850564975966
+SyMANTIC greedy equation: -0.09999940887036936*((PEOE_VSA6+VSA_EState6)+(PEOE_VSA6/BCUT2D_LOGPLOW)) + 0.24325786688084544*((Kappa2/FpDensityMorgan2)/(VSA_EState6+BCUT2D_LOGPLOW)) - 1.1779716948012378
+
+Downsample size: 22, Repetition: 5
+ESOL refitted equation: logS = 4.516e-03*mw - 4.415e-01*logp - 2.325e-01*rotors - 2.604e+00*ap - 1.857e+00
+
+Downsample size: 50, Repetition: 1
+PySR utopia equation: -AvgIpc + MolLogP*(-0.26344366177761924) - NumAromaticRings + fr_NH0 + 0.7784201562409505
+PySR greedy equation: -AvgIpc + MolLogP*(-fr_sulfide - fr_sulfonamd - 0.2463312642677276) + fr_NH0 + (-NumAromaticRings - NumSaturatedCarbocycles + 1.0649901343631476)*1.2375859185181675
+
+Downsample size: 50, Repetition: 1
+SyMANTIC utopia equation: -0.23332478418678454*(MolLogP+PEOE_VSA13) + 2.440098613707691*(FpDensityMorgan1-BCUT2D_LOGPLOW) - 10.027737763921817
+SyMANTIC greedy equation: -0.2136189115098944*((MolLogP+PEOE_VSA13)-(FpDensityMorgan1*BCUT2D_MWLOW)) + 2.9282349814746795*((BCUT2D_MWLOW-BCUT2D_LOGPLOW)+(BCUT2D_LOGPLOW/BCUT2D_MWLOW)) - 39.87627805350171
+
+Downsample size: 50, Repetition: 1
+ESOL refitted equation: logS = -3.934e-03*mw - 3.578e-01*logp + 5.386e-02*rotors - 2.116e+00*ap - 5.413e-01
+
+Downsample size: 50, Repetition: 2
+PySR utopia equation: MinPartialCharge - MolLogP/(0.8865853390208769/(BCUT2D_LOGPLOW*(-MinPartialCharge - 0.7369550882317191))) - fr_C_O_noCOO
+PySR greedy equation: FractionCSP3 - MaxAbsPartialCharge - fr_C_O_noCOO + fr_hdrzone + (MinPartialCharge - MolLogP)/((0.9120940035207514/(BCUT2D_LOGPLOW*(-MinPartialCharge - 0.7605341539967525))))
+
+Downsample size: 50, Repetition: 2
+SyMANTIC utopia equation: -0.04234331814252182*(EState_VSA8+PEOE_VSA8) + -0.3996570199420337*(MolLogP-FpDensityMorgan2) - 1.35142144997051
+SyMANTIC greedy equation: -0.1151641029343624*((EState_VSA8*qed)+(PEOE_VSA8/FpDensityMorgan2)) + 4.0584835972844*((EState_VSA8+EState_VSA3)/(PEOE_VSA6+Ipc)) - 1.4812711396293075
+
+Downsample size: 50, Repetition: 2
+ESOL refitted equation: logS = -9.334e-04*mw - 6.297e-01*logp - 5.195e-02*rotors - 1.161e+00*ap - 3.840e-01
+
+Downsample size: 50, Repetition: 3
+PySR utopia equation: -BCUT2D_CHGHI + Chi4n + fr_pyridine - (fr_bicyclic + (0.9169655725252868 - (fr_COO2 + fr_phos_acid))*(MolLogP + fr_C_O)) + 0.7693643377427747
+PySR greedy equation: -BCUT2D_CHGHI + Chi4n + fr_pyridine - (fr_bicyclic + (0.9169655725252868 - (fr_COO2 + fr_phos_acid))*(MolLogP + fr_C_O)) + 0.7693643377427747
+
+Downsample size: 50, Repetition: 3
+SyMANTIC utopia equation: -65.90000856898904*(MolLogP/BCUT2D_MWLOW) + 5.959809032242379*MolLogP - 1.1323617164639228
+SyMANTIC greedy equation: -4.286573302142609*((MolLogP+Chi0)/(LabuteASA/MolLogP)) + -0.019478488034488473*((Chi2n-BCUT2D_MWLOW)*(BCUT2D_MWLOW-Chi0)) - 1.1852555310193658
+
+Downsample size: 50, Repetition: 3
+ESOL refitted equation: logS = -2.074e-03*mw - 6.942e-01*logp + 1.425e-01*rotors + 3.903e-01*ap - 1.215e+00
+
+Downsample size: 50, Repetition: 4
+PySR utopia equation: MolLogP*(MaxAbsPartialCharge - 0.8222973324793117) - (0.846728255366169 + HallKierAlpha*(-0.6115153565292835))
+PySR greedy equation: -BCUT2D_LOGPHI - MaxPartialCharge*SMR_VSA2 + MolLogP*(MaxAbsPartialCharge - 0.8900977379020926) - NumBridgeheadAtoms - fr_C_O + fr_lactone + 1.2870149863397171
+
+Downsample size: 50, Repetition: 4
+SyMANTIC utopia equation: -0.03233209429011188*(EState_VSA8+PEOE_VSA6) + 0.02342982262101712*(VSA_EState6-SMR_VSA7) - 0.7003193402987105
+SyMANTIC greedy equation: -0.06519608098133399*((PEOE_VSA6*PEOE_VSA7)/(PEOE_VSA7+Kappa3)) + 0.001172823208818406*((EState_VSA8-VSA_EState6)*(EState_VSA4-PEOE_VSA7)) - 1.0526600070794567
+
+Downsample size: 50, Repetition: 4
+ESOL refitted equation: logS = 5.665e-04*mw - 5.556e-01*logp - 2.826e-02*rotors - 5.797e-01*ap - 1.120e+00
+
+Downsample size: 50, Repetition: 5
+PySR utopia equation: -fr_SH + (fr_guanido - 0.6625209719993597)*(Chi1n*qed + MolLogP + fr_Al_COO)
+PySR greedy equation: -fr_SH - fr_guanido + fr_methoxy - (fr_guanido + fr_phos_acid) + (Chi1n*qed + MolLogP + fr_Al_COO)*(-0.6619407395167658)
+
+Downsample size: 50, Repetition: 5
+SyMANTIC utopia equation: -0.6038818323953276*(MolLogP-FpDensityMorgan1) + -2.7512107679177853*BCUT2D_CHGHI + 3.1966202493589466
+SyMANTIC greedy equation: -0.6425114519602473*((MolLogP-FpDensityMorgan1)+(BCUT2D_CHGHI*BCUT2D_LOGPHI)) + 0.0006136656881012322*((PEOE_VSA6-MolMR)/(BCUT2D_CHGHI-BCUT2D_LOGPHI)) + 0.31078904352486214
+
+Downsample size: 50, Repetition: 5
+ESOL refitted equation: logS = 1.844e-03*mw - 5.566e-01*logp - 1.607e-01*rotors - 2.243e+00*ap - 1.184e+00
+
+Downsample size: 112, Repetition: 1
+PySR utopia equation: -AvgIpc + MolLogP*(-0.33483661920486757)
+PySR greedy equation: BCUT2D_CHGLO + MaxAbsPartialCharge + MolLogP*(-fr_sulfonamd - 0.29622242265017484) - NumAromaticCarbocycles - fr_ArN + fr_aniline + fr_azo - fr_sulfide
+
+Downsample size: 112, Repetition: 1
+SyMANTIC utopia equation: -0.399621155581276*MolLogP + -0.004819678956680714*(qed*BertzCT) - 1.0793233410623155
+SyMANTIC greedy equation: -0.025567841972147835*((PEOE_VSA6+PEOE_VSA8)*(MolLogP*qed)) + -0.10596684359225747*((VSA_EState9+SlogP_VSA8)+(Chi3v-FpDensityMorgan1)) - 1.3249769425973177
+
+Downsample size: 112, Repetition: 1
+ESOL refitted equation: logS = -1.152e-03*mw - 4.127e-01*logp + 3.004e-02*rotors - 1.286e+00*ap - 1.391e+00
+
+Downsample size: 112, Repetition: 2
+PySR utopia equation: (-AvgIpc - MolLogP + PEOE_VSA3*0.16642769930706855)*0.6314281567470141
+PySR greedy equation: MolLogP*(-1*0.62833281698817 + MaxAbsPartialCharge*PEOE_VSA3/Chi1) - fr_Nhpyrrole - 1*2.600123815580113 + (VSA_EState8 - 1*(-6.035121673065617))/Chi0v
+
+Downsample size: 112, Repetition: 2
+SyMANTIC utopia equation: -0.7529597070011609*MolLogP + 0.013078258322995178*(MolLogP*PEOE_VSA10) - 0.8987901933074425
+SyMANTIC greedy equation: -0.0589452038215699*((MolMR-PEOE_VSA10)+(MolMR*MinPartialCharge)) + -0.3099883346704232*(FpDensityMorgan1*(MolLogP-FpDensityMorgan1)) - 0.6059959497860898
+
+Downsample size: 112, Repetition: 2
+ESOL refitted equation: logS = 2.525e-04*mw - 5.819e-01*logp - 3.482e-02*rotors - 1.371e+00*ap - 6.354e-01
+
+Downsample size: 112, Repetition: 3
+PySR utopia equation: (AvgIpc + MolLogP)*(-0.6142612709369853)
+PySR greedy equation: -BCUT2D_LOGPHI + fr_pyridine - (fr_ketone - fr_phos_ester) + (MolLogP + fr_ester + SlogP_VSA8/Kappa2)*(-0.5587060183067123) + 1.2184477402933855
+
+Downsample size: 112, Repetition: 3
+SyMANTIC utopia equation: -0.47261265100737154*MolLogP - 1.2156334239687003
+SyMANTIC greedy equation: -1.1412568036397523*((MolLogP*Chi3n)/(qed+Chi2n)) + -0.03034794926760874*((LabuteASA-MolMR)-(Chi3n/qed)) - 0.42845836619223476
+
+Downsample size: 112, Repetition: 3
+ESOL refitted equation: logS = -2.081e-03*mw - 6.496e-01*logp + 6.670e-02*rotors - 6.073e-01*ap - 8.596e-01
+
+Downsample size: 112, Repetition: 4
+PySR utopia equation: (-AvgIpc - MolLogP + fr_para_hydroxylation)/(1.3375209985731127 - MinPartialCharge)
+PySR greedy equation: -AvgIpc - MolLogP/(0.6653429628977424 - MinPartialCharge/(fr_nitro_arom + 0.2522116633646737)) + fr_Ndealkylation2 - fr_Nhpyrrole - fr_ketone + 1.0834882574851146
+
+Downsample size: 112, Repetition: 4
+SyMANTIC utopia equation: -0.5350424810512321*(MolLogP+AvgIpc) - 0.10457049325059309
+SyMANTIC greedy equation: -3.0798606022054984*((MolLogP/BCUT2D_MRHI)+(AvgIpc/BCUT2D_CHGHI)) + 0.04155412247696615*((VSA_EState6-AvgIpc)/(MolLogP-BCUT2D_MRHI)) + 1.9057175059243359
+
+Downsample size: 112, Repetition: 4
+ESOL refitted equation: logS = 7.932e-04*mw - 5.853e-01*logp - 1.326e-02*rotors - 9.590e-01*ap - 9.870e-01
+
+Downsample size: 112, Repetition: 5
+PySR utopia equation: -AvgIpc + MinAbsEStateIndex + MolLogP*(MaxAbsPartialCharge - 0.9268631126664957)
+PySR greedy equation: -AvgIpc + FpDensityMorgan1 - MaxPartialCharge + MinAbsEStateIndex - fr_Ar_OH + fr_phos_ester + (BCUT2D_CHGHI + MolLogP)*(MaxAbsPartialCharge - 0.8498839656732992)
+
+Downsample size: 112, Repetition: 5
+SyMANTIC utopia equation: -0.6273287408576685*(MolLogP+Chi3n) + 0.04427340965259094*(Chi4v*Chi1n) - 0.5556453595981279
+SyMANTIC greedy equation: -0.07142834451355022*((MolLogP+Chi3n)*(BCUT2D_MWLOW-Chi4v)) + 4.965617869078673*((BCUT2D_LOGPHI-Chi4v)/(MolMR/VSA_EState8)) - 0.6118502592376291
+
+Downsample size: 112, Repetition: 5
+ESOL refitted equation: logS = -9.570e-05*mw - 5.869e-01*logp - 2.642e-02*rotors - 1.188e+00*ap - 1.101e+00
+
+Downsample size: 251, Repetition: 1
+PySR utopia equation: MolLogP*(-0.5291578604108426) - 1*1.604097111972955
+PySR greedy equation: BCUT2D_LOGPLOW - (fr_nitro - (FpDensityMorgan1 - MinPartialCharge)) + (MolLogP*(13.86314917468245 - NumHAcceptors)*(-2.474782030724251) - SMR_VSA7)/43.47947471256492
+
+Downsample size: 251, Repetition: 1
+SyMANTIC utopia equation: -0.44255187535707124*MolLogP + 0.02692943462093675*(VSA_EState1-SMR_VSA7) - 1.3451397980483293
+SyMANTIC greedy equation: -0.02974705125554795*((PEOE_VSA6+SlogP_VSA8)-(VSA_EState1-SMR_VSA7)) + -0.6792542113290343*((MolLogP*qed)+(VSA_EState1/MolMR)) - 0.5632944939622706
+
+Downsample size: 251, Repetition: 1
+ESOL refitted equation: logS = 3.692e-04*mw - 5.026e-01*logp - 5.753e-03*rotors - 1.467e+00*ap - 1.251e+00
+
+Downsample size: 251, Repetition: 2
+PySR utopia equation: (BCUT2D_LOGPLOW - MolLogP)*0.6051983296121736
+PySR greedy equation: MinAbsPartialCharge*(-5.489394567158643) + fr_hdrzone - (MinPartialCharge + 0.991812097692464)*(MolLogP + NumAromaticRings*(fr_Ar_OH + fr_COO2 + 0.46047808313381344))
+
+Downsample size: 251, Repetition: 2
+SyMANTIC utopia equation: -0.614996639850189*(MolLogP+BCUT2D_LOGPHI) + -3.7209087668750014*(MinPartialCharge+MinAbsPartialCharge) - 0.7265562210838614
+SyMANTIC greedy equation: -0.30835220400767943*((MolLogP+BCUT2D_LOGPHI)*(MinPartialCharge+BCUT2D_LOGPHI)) + 0.09904513028774084*((MolLogP-VSA_EState9)-(PEOE_VSA6*MinAbsPartialCharge)) + 0.06416159527372534
+
+Downsample size: 251, Repetition: 2
+ESOL refitted equation: logS = -7.555e-04*mw - 6.036e-01*logp - 3.164e-03*rotors - 7.256e-01*ap - 8.259e-01
+
+Downsample size: 251, Repetition: 3
+PySR utopia equation: (AvgIpc + MolLogP)/(-1.6201615528369984)
+PySR greedy equation: -BCUT2D_LOGPHI + FpDensityMorgan2/(Chi0*0.23190928841132694 - SlogP_VSA8) + MolLogP*(fr_hdrzone - 1*0.5557723487706563) - fr_nitro_arom_nonortho + fr_phos_acid
+
+Downsample size: 251, Repetition: 3
+SyMANTIC utopia equation: -0.703977163920871*MolLogP + -0.11661085382620234*(qed*VSA_EState2) - 0.6496876096765858
+SyMANTIC greedy equation: -0.6753835046596743*((MolLogP-MaxAbsPartialCharge)+(BCUT2D_MRLOW*MinEStateIndex)) + -0.1178868148096016*((MinEStateIndex+PEOE_VSA13)+(qed*VSA_EState2)) - 0.7789162861974841
+
+Downsample size: 251, Repetition: 3
+ESOL refitted equation: logS = -2.162e-03*mw - 6.383e-01*logp + 6.173e-02*rotors - 6.996e-01*ap - 8.453e-01
+
+Downsample size: 251, Repetition: 4
+PySR utopia equation: (-MolLogP - 1.4078686665223887)*0.6861539741686582
+PySR greedy equation: -MolLogP - fr_COO2 + fr_azo - fr_nitrile + fr_pyridine + (MaxPartialCharge + fr_NH2*0.23102837700998047)*(MolLogP - 3.1318805261224183)
+
+Downsample size: 251, Repetition: 4
+SyMANTIC utopia equation: -0.8905504416907066*MolLogP + 0.00013216059764240695*(MolLogP*BertzCT) - 0.7123976686679452
+SyMANTIC greedy equation: -32.40898887891214*((MolLogP-FpDensityMorgan1)/(BCUT2D_MRHI*BCUT2D_MWLOW)) + 66.38766027171916*((SlogP_VSA2/MolMR)/(SlogP_VSA2+BCUT2D_MRHI)) - 2.8021482314364894
+
+Downsample size: 251, Repetition: 4
+ESOL refitted equation: logS = 5.783e-04*mw - 6.655e-01*logp - 3.034e-02*rotors - 8.670e-01*ap - 7.841e-01
+
+Downsample size: 251, Repetition: 5
+PySR utopia equation: -0.6307416977307198*(BCUT2D_LOGPHI + MolLogP)
+PySR greedy equation: -fr_amidine - fr_phenol_noOrthoHbond + fr_quatN - qed + (Chi0n*(-MinPartialCharge - 0.8523603848873273) + NumSaturatedHeterocycles + fr_Al_OH)*0.6502444017673582
+
+Downsample size: 251, Repetition: 5
+SyMANTIC utopia equation: -0.5010279690498467*MolLogP + 0.059727580092775484*(Chi3n/MinPartialCharge) - 1.154138517793124
+SyMANTIC greedy equation: -0.08660340433721596*((MolLogP+MolMR)+(MinPartialCharge*MolMR)) + 3.0014221925126464e-07*((BertzCT*Chi3v)*(Chi3v*VSA_EState2)) + 0.403627808253086
+
+Downsample size: 251, Repetition: 5
+ESOL refitted equation: logS = 1.686e-03*mw - 5.570e-01*logp - 6.611e-02*rotors - 1.790e+00*ap - 1.132e+00
+
+Downsample size: 561, Repetition: 1
+PySR utopia equation: (BCUT2D_LOGPLOW - MolLogP)/1.5501631212335163
+PySR greedy equation: BCUT2D_LOGPLOW/1.2315794990073088 + FpDensityMorgan1 - fr_nitro - (fr_Ar_NH - (HallKierAlpha*qed - MolLogP*(MinPartialCharge - 1*(-1.0428573807012431))))
+
+Downsample size: 561, Repetition: 1
+SyMANTIC utopia equation: -0.5705214657181535*MolLogP + -0.14699604856894646*(VSA_EState9+Chi4v) - 1.3668101958293484
+SyMANTIC greedy equation: -1.0854479283291587*((MolLogP+MaxAbsPartialCharge)-(MolLogP*MaxAbsPartialCharge)) + -0.17605883510691*((VSA_EState9+Chi4v)+(BertzCT/MolMR)) + 0.375769311905223
+
+Downsample size: 561, Repetition: 1
+ESOL refitted equation: logS = -3.618e-04*mw - 5.815e-01*logp + 5.458e-04*rotors - 1.232e+00*ap - 1.067e+00
+
+Downsample size: 561, Repetition: 2
+PySR utopia equation: (-MolLogP - 1.5803575465056725)*0.6997352520849253
+PySR greedy equation: -AvgIpc + FractionCSP3 - fr_COO + (MaxAbsPartialCharge - (MaxPartialCharge + MolLogP/(fr_NH0 - (-MaxAbsPartialCharge - 3.174101247399071))))*2.6863764704123407
+
+Downsample size: 561, Repetition: 2
+SyMANTIC utopia equation: -0.68637238485824*MolLogP + -0.07843210638674546*(VSA_EState9+PEOE_VSA14) - 1.0009099619441348
+SyMANTIC greedy equation: -0.9210902804931135*((MolLogP+BCUT2D_LOGPHI)+(MolLogP*MinPartialCharge)) + -0.04513491225534981*((PEOE_VSA6*qed)+(PEOE_VSA14/MaxAbsPartialCharge)) + 1.3577433523957003
+
+Downsample size: 561, Repetition: 2
+ESOL refitted equation: logS = 5.212e-04*mw - 6.665e-01*logp - 2.555e-02*rotors - 1.041e+00*ap - 8.832e-01
+
+Downsample size: 561, Repetition: 3
+PySR utopia equation: (AvgIpc + MolLogP)*(-0.6054064787539026)
+PySR greedy equation: -fr_nitro_arom + (-AvgIpc + BCUT2D_CHGLO*MinAbsPartialCharge + (-MinPartialCharge - 0.7922380359247575)*(MolLogP + fr_Ar_OH) - 1*(-1.5923142045772494))*1.3847674622728725
+
+Downsample size: 561, Repetition: 3
+SyMANTIC utopia equation: -0.6809584504101585*MolLogP + -0.13122630060399812*(VSA_EState2*qed) - 0.6026635810645637
+SyMANTIC greedy equation: -0.4866013542996755*((MolLogP-HallKierAlpha)+(MinPartialCharge/qed)) + -0.041560638148873244*(VSA_EState2+(MolLogP/MaxAbsPartialCharge)) - 0.7305517021616623
+
+Downsample size: 561, Repetition: 3
+ESOL refitted equation: logS = -7.590e-04*mw - 6.122e-01*logp + 2.654e-02*rotors - 1.176e+00*ap - 9.330e-01
+
+Downsample size: 561, Repetition: 4
+PySR utopia equation: (AvgIpc + MolLogP)*(-0.6078489999466132)
+PySR greedy equation: FpDensityMorgan1 - MinAbsPartialCharge/0.3871355416307097 + MolLogP*(MaxAbsPartialCharge - 0.9231238503761497) + fr_hdrzone - fr_nitro_arom - (AvgIpc - fr_azo)
+
+Downsample size: 561, Repetition: 4
+SyMANTIC utopia equation: -0.6801886612921211*MolLogP + -0.036018334731583446*(VSA_EState2+MinEStateIndex) - 0.7681332328423331
+SyMANTIC greedy equation: -1.1592241680279896*((MolLogP-MinPartialCharge)+(MolLogP*MinPartialCharge)) + -0.7061644464325275*((MaxAbsPartialCharge*VSA_EState2)/(BCUT2D_MRHI-MinEStateIndex)) - 0.06184543034478951
+
+Downsample size: 561, Repetition: 4
+ESOL refitted equation: logS = -1.334e-04*mw - 6.699e-01*logp + 1.575e-02*rotors - 1.100e+00*ap - 8.154e-01
+
+Downsample size: 561, Repetition: 5
+PySR utopia equation: -MolLogP*(MinPartialCharge + 1.0512016068229226) - 1.2394092385604276
+PySR greedy equation: (Chi0*qed/(-6.609708659103954) + VSA_EState2/(-62.52944049345799) - (MinPartialCharge + 0.8714013701877978)*(MolLogP + fr_NH2))*1.326962969856961
+
+Downsample size: 561, Repetition: 5
+SyMANTIC utopia equation: -0.5636024532262228*MolLogP + -0.04653452559024703*(MolMR*qed) - 0.19237078891328752
+SyMANTIC greedy equation: -0.9992844556167348*((MolLogP+qed)+(MolLogP*MinPartialCharge)) + -0.004478094168871209*((PEOE_VSA6-VSA_EState1)+(BertzCT*qed)) + 0.02715762463346927
+
+Downsample size: 561, Repetition: 5
+ESOL refitted equation: logS = 1.155e-03*mw - 5.936e-01*logp - 2.422e-02*rotors - 1.450e+00*ap - 1.136e+00
+
+Downsample size: 1257, Repetition: 1
+PySR utopia equation: (BCUT2D_LOGPLOW - MolLogP)*0.6400811123146131
+PySR greedy equation: fr_hdrzone + (-MolLogP - 5.105753834618388)/(1.3985994543167062 - MinPartialCharge) - (MinAbsEStateIndex + PEOE_VSA13*fr_Ar_NH - 7.900228374468256)/Chi1
+
+Downsample size: 1257, Repetition: 1
+SyMANTIC utopia equation: -0.5572361019926881*MolLogP + -0.18614838017804694*(VSA_EState9+Chi3v) - 1.0570445700488433
+SyMANTIC greedy equation: -1.086064589757198*((MolLogP+MaxAbsPartialCharge)+(MolLogP*MinPartialCharge)) + -0.17379276674755967*((VSA_EState9+Chi4v)+(BertzCT/MolMR)) + 0.462773169916757
+
+Downsample size: 1257, Repetition: 1
+ESOL refitted equation: logS = -2.600e-04*mw - 6.092e-01*logp - 1.793e-03*rotors - 1.214e+00*ap - 9.542e-01
+
+Downsample size: 1257, Repetition: 2
+PySR utopia equation: (AvgIpc + MolLogP)/(-1.6021553938745248)
+PySR greedy equation: FpDensityMorgan1 + MinAbsPartialCharge/(-0.29633101261200206) - fr_Ar_NH - fr_nitro - qed + (BCUT2D_LOGPHI + MolLogP)/(-MaxAbsPartialCharge - 1.2204062724488098)
+
+Downsample size: 1257, Repetition: 2
+SyMANTIC utopia equation: -0.6467719672707413*MolLogP + 0.15751601398915066*(HallKierAlpha-VSA_EState9) - 1.22149357429069
+SyMANTIC greedy equation: -0.6679809863364863*((MolLogP-HallKierAlpha)-(MinPartialCharge*HallKierAlpha)) + -0.07123047603163106*((PEOE_VSA14+VSA_EState9)+(MolLogP*MinEStateIndex)) - 0.7696717070615491
+
+Downsample size: 1257, Repetition: 2
+ESOL refitted equation: logS = 3.794e-05*mw - 6.423e-01*logp + 1.127e-03*rotors - 1.120e+00*ap - 1.008e+00
+
+Downsample size: 1257, Repetition: 3
+PySR utopia equation: (AvgIpc + MolLogP)*(-0.6150269512352238)
+PySR greedy equation: BCUT2D_LOGPLOW + FractionCSP3 - fr_Nhpyrrole + (1.013906108657249 - MolLogP)/(MaxAbsPartialCharge + 0.6345525207234395 + 0.06629910600680712/qed)
+
+Downsample size: 1257, Repetition: 3
+SyMANTIC utopia equation: -0.5700738307153099*MolLogP + 0.09337436860768013*(HallKierAlpha/MaxAbsPartialCharge) - 1.1281184052525353
+SyMANTIC greedy equation: -0.6452066950792635*((MolLogP-HallKierAlpha)-(HallKierAlpha*MinPartialCharge)) + -0.08768033264439654*(PEOE_VSA14+(MolLogP*MinEStateIndex)) - 0.7741847645577122
+
+Downsample size: 1257, Repetition: 3
+ESOL refitted equation: logS = -6.723e-04*mw - 6.268e-01*logp + 3.337e-02*rotors - 1.116e+00*ap - 1.009e+00
+
+Downsample size: 1257, Repetition: 4
+PySR utopia equation: (AvgIpc + MolLogP)*(-0.6082024810157342)
+PySR greedy equation: -AvgIpc + FpDensityMorgan1 + MolLogP*0.5947311121971541*(MaxAbsPartialCharge - qed - 1.0901234385167338) + fr_azo - fr_nitro + fr_thiocyan
+
+Downsample size: 1257, Repetition: 4
+SyMANTIC utopia equation: -0.6056868260701753*MolLogP + -0.04609331526671943*(VSA_EState9+SlogP_VSA8) - 1.2204549669386973
+SyMANTIC greedy equation: -0.6458962683086441*((MolLogP-HallKierAlpha)-(MinPartialCharge*HallKierAlpha)) + 0.11396261670346088*((MinPartialCharge-BCUT2D_MRLOW)*(MolLogP*MinEStateIndex)) - 0.8212461995576379
+
+Downsample size: 1257, Repetition: 4
+ESOL refitted equation: logS = -4.001e-04*mw - 6.579e-01*logp + 3.454e-02*rotors - 9.347e-01*ap - 9.813e-01
+
+Downsample size: 1257, Repetition: 5
+PySR utopia equation: (AvgIpc + MolLogP)*(-0.606653071214276)
+PySR greedy equation: -MaxPartialCharge + fr_azo - fr_nitro_arom - fr_priamide + (AvgIpc + 0.4372642118461515*MolLogP)*(MaxAbsPartialCharge - 1*1.7102383520759712) + 1.5873630523610571
+
+Downsample size: 1257, Repetition: 5
+SyMANTIC utopia equation: -0.689537014269239*MolLogP + -0.031499804862591095*(MolLogP*VSA_EState9) - 1.2069203885424327
+SyMANTIC greedy equation: -1.06567402422846*((MolLogP-MinPartialCharge)+(MolLogP*MinPartialCharge)) + -0.20278633899902612*((MaxAbsPartialCharge*VSA_EState9)+(BertzCT/MolMR)) + 0.26945659601119853
+
+Downsample size: 1257, Repetition: 5
+ESOL refitted equation: logS = 7.368e-04*mw - 6.528e-01*logp - 1.342e-03*rotors - 1.144e+00*ap - 1.047e+00
+
+Downsample size: 2815, Repetition: 1
+PySR utopia equation: -0.6258959106197134*(AvgIpc + MolLogP)
+PySR greedy equation: -AvgIpc*MaxPartialCharge + FpDensityMorgan1 + MolLogP*(MaxAbsPartialCharge - 0.9315775367155461) + fr_hdrzone - fr_nitro - (BCUT2D_LOGPHI + fr_Nhpyrrole)
+
+Downsample size: 2815, Repetition: 1
+SyMANTIC utopia equation: -0.6393026684206614*MolLogP + -0.0391539240305631*(VSA_EState9+VSA_EState2) - 0.9344308361212934
+SyMANTIC greedy equation: -1.1061596089237795*((MolLogP+MaxAbsPartialCharge)+(MolLogP*MinPartialCharge)) + -0.041048632214286764*((VSA_EState9+VSA_EState2)-(HallKierAlpha-VSA_EState9)) - 0.3142127600353626
+
+Downsample size: 2815, Repetition: 1
+ESOL refitted equation: logS = -6.640e-05*mw - 6.265e-01*logp + 9.637e-03*rotors - 1.087e+00*ap - 1.037e+00
+

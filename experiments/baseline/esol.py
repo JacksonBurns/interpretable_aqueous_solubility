@@ -108,6 +108,6 @@ def fit_esol(
         desc_new = df_new[smiles_col].map(calc_descriptors).dropna().apply(pd.Series)
         X_new = desc_new[feature_names].values
         y_hat = model.intercept_ + X_new @ model.coef_
-        return pd.Series(y_hat, index=desc_new.index), pd.DataFrame(data=X_new, columns=feature_names, index=desc_new.index)
+        return pd.Series(y_hat, index=desc_new.index)
 
     return predictor, result
