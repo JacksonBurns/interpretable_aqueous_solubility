@@ -1,24 +1,3 @@
-"""
-I've uploaded you some start code and the actual data for a machine learning experiment I am running. Write additional code to generate the following plots:
-
-1. Parity Plots
-
-For the models run on the entire dataset (the last column in the _pred CSVs, called modelname_pred), make a parity plot with the existing parity plot function.
-
-2. Simultaneous comparison
-
-Also for the full dataset, make a plot with two columns (one for each dataset) showing the performance of each model in terms of RMSE on the horiztonal axis and spearman rho on the vertical axis. Organize the plot as a pareto front, sharing the dominated region.
-
-You should include statistical tests and errors bars in this plot. Using whatever method you deem appropriate, such as 2000 iteration bootstrapping and a simultaneous comparison (you should choose the best, publiation quality method), any model which is indistribuishable from the best on the respsective metric should have solid errors bars, whereas other should be dashed. 
-
-3. Performance trajectory
-
-Finally, the other columns. The other present columns follow the pattern modelname_number of training points_repeition_pred, where the dataset has been downsampled to the indicated size 5 total times. You should make a plot of the log10 number of training points on the horiztonal axis and the performance on the vertical axis. lay out the plots in the 2x2 grid, with columns for the dataset and rows for the RMSE and spearman metrics, respectively. 
-
-This plot should also include statistics - using statsmodels, check which model is the best on each downsample size according to the tukey HSD test, then color that marker solid. Any model which is indistruishable from that model should also be colored solid with others hollow. For the final full dataset, where all points are used, re-use the results of the bootstrapping from plot 2 to determine coloring.
-
-Save all plots as PDFs at 300 dpi to the directory "../results/" with an appropriate name. Ensure you call plt.close() after aevery plotting call, to reduce memory onsumption. Keep the code concise and readable, relying on external libraries wherever possible.
-"""
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -26,7 +5,6 @@ from scipy.stats import pearsonr
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 import os
-import re
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -52,6 +30,18 @@ MODEL_COLORS = {
     "symantic_greedy": "#ffbb78",  # light orange
     "pysr_greedy": "#98df8a",  # light green
     "rf": "#9467bd",  # purple
+}
+
+PRETTY_NAME = {
+    "esol": "ESOL (refit)",
+    "symantic_utopia": "SyMANTIC (utopia)",
+    "pysr_utopia": "PySR (utopia)",
+    "chemeleon": "CheMeleon",
+    "symantic_greedy": "SyMANTIC (greedy)",
+    "pysr_greedy": "PySR (greedy)",
+    "rf": "Random Forest",
+    "biogen": "Biogen",
+    "ochem": "OChem",
 }
 
 
@@ -101,10 +91,9 @@ def parity_plot(y_true, y_pred, outname):
     ]
     plt.plot(lims, lims, color="red", linestyle="--", linewidth=1.5)
 
-    # Labels and title
+    # Labels
     plt.xlabel("Measured log(solubility) [mol/L]", fontsize=12)
     plt.ylabel("Predicted log(solubility) [mol/L]", fontsize=12)
-    plt.title("Parity Plot", fontsize=14)
 
     # Annotation with statistics
     stats_text = f"$r$ = {r:.3f}\n" f"RMSE = {rmse:.3f}\n" f"MAE = {mae:.3f}"
@@ -129,8 +118,10 @@ def parity_plot(y_true, y_pred, outname):
 
 
 if __name__ == "__main__":
+
     biogen_df = pd.read_csv("biogen_pred.csv")
     biogen_df = replace_errors(biogen_df)
+
     ochem_df = pd.read_csv("ochem_pred.csv")
     ochem_df = replace_errors(ochem_df)
 
@@ -144,14 +135,15 @@ if __name__ == "__main__":
             y_pred = df[f"{model}_pred"]
             outname = f"../results/parity_{ds_name}_{model}.pdf"
             parity_plot(y_true, y_pred, outname)
-            plt.close()
 
     # --- 2. Simultaneous Comparison ---
     n_boot = 2000
     boot_results = {}
 
-    # Bootstrapping loop to calculate distributions of RMSE and Spearman Rho
-    for ds_name, df in datasets.items():
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    indistinguishable_full = {} 
+
+    for ax, (ds_name, df) in zip(axes, datasets.items()):
         y_true = df['logS'].values
         n_samples = len(y_true)
         boot_results[ds_name] = {m: {'rmse': [], 'spearman': []} for m in models}
@@ -169,15 +161,10 @@ if __name__ == "__main__":
                 boot_results[ds_name][m]['rmse'].append(rmse)
                 boot_results[ds_name][m]['spearman'].append(rho)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-    indistinguishable_full = {} 
-
-    for ax, ds_name in zip(axes, datasets.keys()):
         indistinguishable_full[ds_name] = {'rmse': [], 'spearman': []}
         means = {m: {'rmse': np.mean(boot_results[ds_name][m]['rmse']), 
                     'spearman': np.mean(boot_results[ds_name][m]['spearman'])} for m in models}
         
-        # Selecting the best performing reference points
         best_rmse_model = min(models, key=lambda m: means[m]['rmse'])
         best_spearman_model = max(models, key=lambda m: means[m]['spearman'])
         
@@ -187,64 +174,115 @@ if __name__ == "__main__":
         best_rmse_boot = np.array(boot_results[ds_name][best_rmse_model]['rmse'])
         best_spearman_boot = np.array(boot_results[ds_name][best_spearman_model]['spearman'])
         
-        # 95% Confidence Interval tests across metrics
         for m in models:
             if m != best_rmse_model:
                 diff = np.array(boot_results[ds_name][m]['rmse']) - best_rmse_boot
-                ci = np.percentile(diff, [2.5, 97.5])
-                if ci[0] <= 0 <= ci[1]:
-                    indist_rmse.append(m)
+                ci = np.percentile(diff, [0.416, 99.584])  # 7-way bonferroni correction
+                if ci[0] <= 0 <= ci[1]: indist_rmse.append(m)
             if m != best_spearman_model:
                 diff = best_spearman_boot - np.array(boot_results[ds_name][m]['spearman'])
-                ci = np.percentile(diff, [2.5, 97.5])
-                if ci[0] <= 0 <= ci[1]:
-                    indist_spearman.append(m)
+                ci = np.percentile(diff, [0.416, 99.584])  # 7-way bonferroni correction
+                if ci[0] <= 0 <= ci[1]: indist_spearman.append(m)
                     
         indistinguishable_full[ds_name]['rmse'] = indist_rmse
         indistinguishable_full[ds_name]['spearman'] = indist_spearman
         
+        points = []
         for m in models:
             r_mean = means[m]['rmse']
             s_mean = means[m]['spearman']
-            r_ci = np.percentile(boot_results[ds_name][m]['rmse'], [2.5, 97.5])
-            s_ci = np.percentile(boot_results[ds_name][m]['spearman'], [2.5, 97.5])
+            points.append((r_mean, s_mean))
+            r_ci = np.percentile(boot_results[ds_name][m]['rmse'], [0.416, 99.584])  # 7-way bonferroni correction
+            s_ci = np.percentile(boot_results[ds_name][m]['spearman'], [0.416, 99.584])  # 7-way bonferroni correction
             
             r_err = [[r_mean - r_ci[0]], [r_ci[1] - r_mean]]
             s_err = [[s_mean - s_ci[0]], [s_ci[1] - s_mean]]
             
             r_ls = 'solid' if m in indist_rmse else 'dashed'
             s_ls = 'solid' if m in indist_spearman else 'dashed'
+
+            eb = ax.errorbar(r_mean, s_mean, xerr=r_err, color=MODEL_COLORS[m], alpha=0.7, zorder=2)
+            eb[-1][0].set_linestyle(r_ls)
+            eb = ax.errorbar(r_mean, s_mean, yerr=s_err, color=MODEL_COLORS[m], alpha=0.7, zorder=2)
+            eb[-1][0].set_linestyle(s_ls)
+            ax.scatter(r_mean, s_mean, color=MODEL_COLORS[m], label=PRETTY_NAME[m], zorder=5)
+
+        # Shade Pareto / Dominated Region
+        pareto_points = []
+        for i, (r1, s1) in enumerate(points):
+            dominated = False
+            for j, (r2, s2) in enumerate(points):
+                if i != j:
+                    if r2 <= r1 and s2 >= s1 and (r2 < r1 or s2 > s1):
+                        dominated = True
+                        break
+            if not dominated:
+                pareto_points.append((r1, s1))
+                
+        pareto_points.sort(key=lambda x: x[0]) 
+        
+        if pareto_points:
+            rs = [p[0] for p in pareto_points]
+            ss = [p[1] for p in pareto_points]
             
-            ax.errorbar(r_mean, s_mean, xerr=r_err, color=MODEL_COLORS[m], linestyle=r_ls, alpha=0.7, zorder=1)
-            ax.errorbar(r_mean, s_mean, yerr=s_err, color=MODEL_COLORS[m], linestyle=s_ls, alpha=0.7, zorder=1)
-            ax.scatter(r_mean, s_mean, color=MODEL_COLORS[m], label=m, zorder=5)
+            r_lim_min, r_lim_max = ax.get_xlim()
+            s_lim_min, s_lim_max = ax.get_ylim()
+            
+            r_max = max(max(rs)*1.1, r_lim_max) + 1.0
+            s_min = min(min(ss)*0.9, s_lim_min) - 1.0
+            
+            shade_r = [r_max, r_max]
+            shade_s = [s_min, ss[-1]]
+            
+            for i in range(len(rs)-1, 0, -1):
+                shade_r.append(rs[i])
+                shade_s.append(ss[i])
+                shade_r.append(rs[i])
+                shade_s.append(ss[i-1])
+                
+            shade_r.append(rs[0])
+            shade_s.append(ss[0])
+            shade_r.append(rs[0])
+            shade_s.append(s_min)
+            
+            ax.fill(shade_r, shade_s, color='lightgray', alpha=0.5, zorder=0)
 
-        ax.set_title(f"{ds_name} Dataset")
-        ax.set_xlabel("RMSE")
-        ax.set_ylabel("Spearman Rho")
+        ax.invert_xaxis() 
+        # Reset limits gracefully after shading off-screen boundary polygons
+        ax.set_xlim(r_lim_max + (r_lim_max-r_lim_min)*0.05, r_lim_min - (r_lim_max-r_lim_min)*0.05)
+        ax.set_ylim(s_lim_min - (s_lim_max-s_lim_min)*0.05, s_lim_max + (s_lim_max-s_lim_min)*0.05)
 
-    axes[0].legend()
+        ax.grid(True, alpha=0.3)
+        ax.set_title(PRETTY_NAME[ds_name.lower()])
+        ax.set_xlabel("RMSE $\\rightarrow$ (Better)")
+        ax.set_ylabel("Spearman Rho $\\rightarrow$ (Better)")
+        ax.grid(True)
+
+    axes[0].legend(loc='lower right', fontsize=12)
     plt.tight_layout()
     plt.savefig('../results/simultaneous_comparison.pdf', dpi=300)
     plt.close()
 
-    # --- 3. Performance Trajectory ---
+    # --- 3. Performance trajectory ---
+    # leaves the greedy traces out for the sake of being easier to read
     sizes = [10, 22, 50, 112, 251, 561, 1257]
+    full_size = 2815
     metrics = ['rmse', 'spearman']
 
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    fig, axes = plt.subplots(2, 2, figsize=(8, 6))
 
-    # Plot lines
     for c, (ds_name, df) in enumerate(datasets.items()):
         y_true = df['logS'].values
         
         for r, metric in enumerate(metrics):
             ax = axes[r, c]
+            ax.grid(True, alpha=0.3)
             
             for m in models:
                 x_vals = []
                 y_vals = []
-                
+                y_errs = []
+
                 for size in sizes:
                     reps = []
                     for rep in range(5):
@@ -259,16 +297,28 @@ if __name__ == "__main__":
                     if len(reps) > 0:
                         x_vals.append(size)
                         y_vals.append(np.mean(reps))
+                        y_errs.append(np.std(reps))
                         
                 if len(x_vals) > 0:
-                    ax.plot(np.log10(x_vals), y_vals, color=MODEL_COLORS[m], zorder=1)
+                    full_val = np.mean(boot_results[ds_name][m][metric])
+                    full_err = np.std(boot_results[ds_name][m][metric])
+                    
+                    x_vals.append(full_size)
+                    y_vals.append(full_val)
+                    y_errs.append(full_err)
+                    
+                    if "greedy" not in m:
+                        ax.plot(np.log10(x_vals), y_vals, color=MODEL_COLORS[m], zorder=2)
+                        # ax.errorbar(np.log10(x_vals), y_vals, yerr=y_errs, fmt='none', color=MODEL_COLORS[m], alpha=0.2, zorder=1) <-- not needed, marker filledness shows this
 
-    # Overlay Statistical tests
     for c, (ds_name, df) in enumerate(datasets.items()):
         y_true = df['logS'].values
+        
         for r, metric in enumerate(metrics):
             ax = axes[r, c]
-            
+
+            y_max = 0.0
+            y_min = np.inf
             for size in sizes:
                 all_vals = []
                 groups = []
@@ -285,10 +335,12 @@ if __name__ == "__main__":
                             groups.append(m)
                 
                 if len(all_vals) > 0:
-                    # Tukey HSD tests directly per subset 
                     tukey = pairwise_tukeyhsd(all_vals, groups, alpha=0.05)
                     means = pd.DataFrame({'val': all_vals, 'group': groups}).groupby('group').mean()
-                    best_m = means['val'].idxmin() if metric == 'rmse' else means['val'].idxmax()
+                    if metric == 'rmse':
+                        best_m = means['val'].idxmin()
+                    else:
+                        best_m = means['val'].idxmax()
                     
                     indist = [best_m]
                     for row in tukey.summary().data[1:]:
@@ -303,25 +355,43 @@ if __name__ == "__main__":
                             mean_val = means.loc[m, 'val']
                             marker = 'o'
                             facecolor = MODEL_COLORS[m] if m in indist else 'white'
-                            ax.scatter(np.log10(size), mean_val, edgecolor=MODEL_COLORS[m], facecolor=facecolor, marker=marker, zorder=5)
-
+                            if "greedy" not in m:
+                                ax.scatter(np.log10(size), mean_val, edgecolor=MODEL_COLORS[m], facecolor=facecolor, marker=marker, zorder=5)
+                                if mean_val > y_max:
+                                    y_max = mean_val
+                                if mean_val < y_min:
+                                    y_min = mean_val
             for m in models:
                 mean_val = np.mean(boot_results[ds_name][m][metric])
                 indist = indistinguishable_full[ds_name][metric]
                 facecolor = MODEL_COLORS[m] if m in indist else 'white'
-                ax.scatter(np.log10(biogen_df.shape[0] if ds_name == "biogen" else ochem_df.shape[0]), mean_val, edgecolor=MODEL_COLORS[m], facecolor=facecolor, marker='*', s=150, zorder=5)
+                if "greedy" not in m:
+                    ax.scatter(np.log10(full_size), mean_val, edgecolor=MODEL_COLORS[m], facecolor=facecolor, marker='*', s=150, zorder=5)
+                    if mean_val > y_max:
+                        y_max = mean_val
+                    if mean_val < y_min:
+                        y_min = mean_val
+            ax.set_ylim(bottom=y_min*0.95, top=y_max*1.05)
 
             if r == 0:
-                ax.set_title(ds_name)
+                ax.set_title(PRETTY_NAME[ds_name.lower()])
             if r == 1:
-                ax.set_xlabel("log10|Training Points|")
+                ax.set_xlabel("Training Points ($log_{10}$ scale)")
             if c == 0:
                 ax.set_ylabel(metric.upper() if metric == 'rmse' else "Spearman Rho")
 
-            if r == 1 and c == 1:
+            if r == 0 and c == 0:
+                handles, labels = ax.get_legend_handles_labels()
                 for m in models:
-                    ax.scatter([], [], color=MODEL_COLORS[m], label=m)
-                ax.legend(fontsize=8, loc='best')
+                    if "greedy" not in m:
+                        ax.scatter([], [], color=MODEL_COLORS[m], label=PRETTY_NAME[m])
+                ax.legend(fontsize=8, loc='upper right')
+
+            # x ticks and labels
+            ax.set_xlim(np.log10(sizes[0])*0.95, np.log10(full_size)*1.05)
+            ticks = [10, 25, 50, 100, 200, 500, 1000, 3000]
+            ax.set_xticks(np.log10(ticks))
+            ax.set_xticklabels(list(map(str, ticks)))
                 
     plt.tight_layout()
     plt.savefig('../results/performance_trajectory.pdf', dpi=300)
