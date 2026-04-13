@@ -36,6 +36,6 @@ def fit_rf(
         X_new = _featurize(df_new[smiles_col])
         X_new, _ = _impute(X_new, means)
         y_hat = rf.predict(X_new)
-        return pd.Series(y_hat, index=df_new.index), X_new
+        return pd.Series(y_hat, index=df_new.index)
 
     return predictor, rf
