@@ -29,6 +29,7 @@ def fit_chemeleon(df: pd.DataFrame, smiles_col: str = "SMILES", target_col: str 
             "--ffn-hidden-dim", "2048",
             "--batch-size", "32",
             "--epochs", "50",
+            "--remove-checkpoints",
         ],
         check=True
     )

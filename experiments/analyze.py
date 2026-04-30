@@ -285,7 +285,7 @@ if __name__ == "__main__":
 
                 for size in sizes:
                     reps = []
-                    for rep in range(5):
+                    for rep in range(20):
                         col = f"{m}_{size}_{rep}_pred"
                         if col in df.columns:
                             y_pred = df[col].values
@@ -323,7 +323,7 @@ if __name__ == "__main__":
                 all_vals = []
                 groups = []
                 for m in models:
-                    for rep in range(5):
+                    for rep in range(20):
                         col = f"{m}_{size}_{rep}_pred"
                         if col in df.columns:
                             y_pred = df[col].values
@@ -371,12 +371,10 @@ if __name__ == "__main__":
                         y_max = mean_val
                     if mean_val < y_min:
                         y_min = mean_val
-            ax.set_ylim(bottom=y_min*0.95, top=y_max*1.05)
+            ax.set_ylim(bottom=0.5 if metric == "rmse" else 0.0, top=3.0 if metric=="rmse" else 1.0)
 
             if r == 0:
                 ax.set_title(PRETTY_NAME[ds_name.lower()])
-            if r == 1:
-                ax.set_xlabel("Training Points ($log_{10}$ scale)")
             if c == 0:
                 ax.set_ylabel(metric.upper() if metric == 'rmse' else "Spearman Rho")
 
@@ -392,7 +390,7 @@ if __name__ == "__main__":
             ticks = [10, 25, 50, 100, 200, 500, 1000, 3000]
             ax.set_xticks(np.log10(ticks))
             ax.set_xticklabels(list(map(str, ticks)))
-                
+    fig.supxlabel("Number of Training Points (scaled to $log_{10}$)")
     plt.tight_layout()
     plt.savefig('../results/performance_trajectory.pdf', dpi=300)
     plt.close()

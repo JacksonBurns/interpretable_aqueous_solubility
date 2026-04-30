@@ -38,7 +38,7 @@ if __name__ == "__main__":
         dtype=int,
     )
     downsample_sizes[-1] = _train_df.shape[0]
-    repetitions = 5
+    repetitions = 20
     logfile = "fit_results.txt"
     for n in downsample_sizes:
         print(f"\n\n=== Training models on downsampled dataset of size {n} ===")
@@ -49,6 +49,11 @@ if __name__ == "__main__":
             biogen_df = _biogen_df.copy()
 
             pred_str = "_pred" if n == downsample_sizes[-1] else f"_{n}_{rep}_pred"
+            
+            # chemeleon
+            f_chemeleon, _ = fit_chemeleon(train_df.copy())
+            _biogen_df["chemeleon" + pred_str] = f_chemeleon(biogen_df)
+            _ochem_df["chemeleon" + pred_str] = f_chemeleon(ochem_df)
 
             # pysr
             (f_pysr_utopia, f_pysr_greedy), (pysr_utopia_eqn, pysr_greedy_eqn) = fit_pysr(train_df.copy())
@@ -92,11 +97,6 @@ if __name__ == "__main__":
             f_rf, _ = fit_rf(train_df.copy())
             _biogen_df["rf" + pred_str] = f_rf(biogen_df)
             _ochem_df["rf" + pred_str] = f_rf(ochem_df)
-            
-            # chemeleon
-            f_chemeleon, _ = fit_chemeleon(train_df.copy())
-            _biogen_df["chemeleon" + pred_str] = f_chemeleon(biogen_df)
-            _ochem_df["chemeleon" + pred_str] = f_chemeleon(ochem_df)
 
             if n == downsample_sizes[-1]:
                 break  # only run the full dataset once
