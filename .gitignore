@@ -4,4 +4,6 @@ screen.log
 __pycache__
 # training output files
 chemeleon_training
-
+chemprop_training
+ochem_pred.csv
+biogen_pred.csv
