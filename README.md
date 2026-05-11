@@ -10,34 +10,8 @@ For comparison, we test all of the below models:
  - Random Forest with Morgan Count and RDKit Descriptors, as in [MolPipeline](https://doi.org/10.1021/acs.jcim.4c00863)
  - [`SyMANTIC`](https://doi.org/10.48550/arXiv.2502.03367)
 
-[Gaussian Process](https://scikit-learn.org/stable/modules/gaussian_process.html) modeling of the residuals is also applied to the ESOL and `SyMANTIC` linear models to demonstrate how giving up _some_ interpretability can change the performance.
-The goal of this repository is to explore the interpretability-performance tradeoff in aqueous solubility modeling.
-To do so we use `SyMANTIC` to automatically discover interpretable equations from descriptors and machinelearning to push for absolute performance.
-
-For comparison, we test all of the below models:
-
- - [ESOL](https://doi.org/10.1021/ci034243x)
- - [`CheMeleon`](https://doi.org/10.48550/arXiv.2506.15792)
- - Random Forest with Morgan Count and RDKit Descriptors, as in [MolPipeline](https://doi.org/10.1021/acs.jcim.4c00863)
- - [`SyMANTIC`](https://doi.org/10.48550/arXiv.2502.03367)
-
-[Gaussian Process](https://scikit-learn.org/stable/modules/gaussian_process.html) modeling of the residuals is also applied to the ESOL and `SyMANTIC` linear models to demonstrate how giving up _some_ interpretability can change the performance.
-
 ## Usage
 
-### Datasets
-
-All of the data needed is already in `data`, retrieved from:
-
- - `biogen`: [this repository](https://raw.githubusercontent.com/PatWalters/practical_cheminformatics_posts/refs/heads/main/solubility/biogen_solubility.csv), originally curated [here](https://doi.org/10.1021/acs.jcim.3c00160)
- - `ochem` and `aqsoldbc`: [this demo repository](https://github.com/JacksonBurns/fastprop_llompart/tree/main/data), originally curated in [this article](https://doi.org/10.1038/s41597-024-03105-6)
- - `esol.csv`: (unused) [kaggle](https://www.kaggle.com/datasets/yeonseokcho/delaney), originally curated in the ESOL paper
- - `ancenes.csv`: curated from Wikipedia entries as part of this demo
- - `ralston_hoerr_joc_1942.csv`: fatty acid solubility data digitized from [THE SOLUBILITIES OF THE NORMAL SATURATED FATTY ACIDS](https://doi.org/10.1021/jo01200a013)
-
-### Dependencies
-
-With Python 3.13 (or really any modern version of Python) use `pip` to install the following:
 ### Datasets
 
 All of the data needed is already in `data`, retrieved from:
