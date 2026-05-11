@@ -8,7 +8,9 @@ from interpretable.symantic import fit_symantic
 from interpretable.pysr import fit_pysr
 from baseline.esol import fit_esol
 from baseline.rf import fit_rf
+from baseline.guess_mean import fit_guess_mean
 from deep.chemeleon import fit_chemeleon
+from deep.chemprop import fit_chemprop
 
 
 if __name__ == "__main__":
@@ -50,10 +52,15 @@ if __name__ == "__main__":
 
             pred_str = "_pred" if n == downsample_sizes[-1] else f"_{n}_{rep}_pred"
             
-            # chemeleon
-            f_chemeleon, _ = fit_chemeleon(train_df.copy())
-            _biogen_df["chemeleon" + pred_str] = f_chemeleon(biogen_df)
-            _ochem_df["chemeleon" + pred_str] = f_chemeleon(ochem_df)
+            # mean-guessing baseline
+            f_guess_mean, _ = fit_guess_mean(train_df.copy())
+            _biogen_df["guess_mean" + pred_str] = f_guess_mean(biogen_df)
+            _ochem_df["guess_mean" + pred_str] = f_guess_mean(ochem_df)
+            
+            # chemprop
+            f_chemprop, _ = fit_chemprop(train_df.copy())
+            _biogen_df["chemprop" + pred_str] = f_chemprop(biogen_df)
+            _ochem_df["chemprop" + pred_str] = f_chemprop(ochem_df)
 
             # pysr
             (f_pysr_utopia, f_pysr_greedy), (pysr_utopia_eqn, pysr_greedy_eqn) = fit_pysr(train_df.copy())
