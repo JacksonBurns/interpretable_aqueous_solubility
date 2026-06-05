@@ -191,6 +191,8 @@ if __name__ == "__main__":
     models = list(MODEL_COLORS.keys())
     datasets = {'OCHEM': ochem_df, 'BIOGEN': biogen_df}
 
+    plot_custom_correlation_matrix(ochem_df, "../results/heatmap_ochem.pdf")
+
     plot_custom_correlation_matrix(biogen_df, "../results/heatmap.pdf")
 
     # --- 1. Parity Plots ---
