@@ -1,15 +1,12 @@
+import os
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 from scipy.stats import pearsonr
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-
-import os
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
-from sklearn.metrics import mean_squared_error
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 
@@ -116,6 +113,72 @@ def parity_plot(y_true, y_pred, outname):
     plt.close()
 
 
+def plot_custom_correlation_matrix(df, output_path="results/biogen_corr_combined.pdf"):
+   
+    # 2. Map dataset columns to clean display names
+    model_names = {
+        'logS': 'True logS',
+        'esol_pred': PRETTY_NAME['esol'],
+        'symantic_utopia_pred': PRETTY_NAME['symantic_utopia'],
+        'pysr_utopia_pred': PRETTY_NAME['pysr_utopia'],
+        'chemeleon_pred': PRETTY_NAME['chemeleon'],
+        'rf_pred': PRETTY_NAME['rf'],
+    }
+    df_renamed = df.copy(deep=True).rename(columns=model_names)
+    
+    # Define our grid structure: columns are models, rows have True values on top
+    cols = [name for key, name in model_names.items() if key != 'logS']
+    rows = ['True logS'] + cols
+    
+    # 3. Calculate full correlation matrix
+    corr = df_renamed[rows].corr(method='spearman')
+    
+    # Filter matrix to our specific asymmetric layout (6 rows x 5 cols)
+    corr_subset = corr.loc[rows, cols]
+    
+    # 4. Create custom mask to hide the upper triangle of the models, 
+    # but keep the 1.0 diagonals and keep the ENTIRE top row visible.
+    mask = np.zeros_like(corr_subset, dtype=bool)
+    for i in range(len(rows)):
+        for j in range(len(cols)):
+            if i == 0:
+                # Keep the whole first row ('True logS') visible
+                mask[i, j] = False
+            else:
+                # For models (i >= 1), mask the upper triangle. 
+                # (i - 1) shifts the row index back to align with the columns.
+                if (i - 1) < j:
+                    mask[i, j] = True
+                else:
+                    mask[i, j] = False
+                    
+    # 5. Plotting
+    plt.figure(figsize=(9, 8))
+    
+    ax = sns.heatmap(
+        corr_subset, 
+        mask=mask, 
+        cmap='viridis', 
+        vmax=1.0, 
+        vmin=0.0,
+        square=True, 
+        linewidths=1.0, 
+        cbar_kws={"shrink": .75}, 
+        annot=True, 
+        fmt=".2f"
+    )
+    
+    # Draw a distinct, thick white line to separate the "Accuracy" row from the "Agreement" triangle
+    ax.axhline(1, color='white', linewidth=5)
+    plt.xticks(rotation=45, ha='right')
+    plt.yticks(rotation=0)
+    
+    # 6. Save and clean up
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300)
+    print(f"Matrix successfully saved to {output_path}")
+    plt.show()
+
 
 if __name__ == "__main__":
 
@@ -127,6 +190,8 @@ if __name__ == "__main__":
 
     models = list(MODEL_COLORS.keys())
     datasets = {'OCHEM': ochem_df, 'BIOGEN': biogen_df}
+
+    plot_custom_correlation_matrix(biogen_df, "../results/heatmap.pdf")
 
     # --- 1. Parity Plots ---
     for ds_name, df in datasets.items():
