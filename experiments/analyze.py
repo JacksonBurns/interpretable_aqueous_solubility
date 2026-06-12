@@ -32,6 +32,16 @@ MODEL_COLORS = {
     "rf": "#9467bd",  # purple
 }
 
+MODEL_MARKERS = {
+    "esol": "o",
+    "symantic_utopia": "s",
+    "pysr_utopia": "^",
+    "chemeleon": "D",
+    "symantic_greedy": "P",
+    "pysr_greedy": "X",
+    "rf": "v",
+}
+
 PRETTY_NAME = {
     "esol": "ESOL (refit)",
     "symantic_utopia": "SyMANTIC (utopia)",
@@ -205,7 +215,7 @@ if __name__ == "__main__":
             eb[-1][0].set_linestyle(r_ls)
             eb = ax.errorbar(r_mean, s_mean, yerr=s_err, color=MODEL_COLORS[m], alpha=0.7, zorder=2)
             eb[-1][0].set_linestyle(s_ls)
-            ax.scatter(r_mean, s_mean, color=MODEL_COLORS[m], label=PRETTY_NAME[m], zorder=5)
+            ax.scatter(r_mean, s_mean, color=MODEL_COLORS[m], label=PRETTY_NAME[m], zorder=5, marker=MODEL_MARKERS[m])
 
         # Shade Pareto / Dominated Region
         pareto_points = []
@@ -255,7 +265,7 @@ if __name__ == "__main__":
         ax.grid(True, alpha=0.3)
         ax.set_title(PRETTY_NAME[ds_name.lower()])
         ax.set_xlabel("RMSE $\\rightarrow$ (Better)")
-        ax.set_ylabel("Spearman Rho $\\rightarrow$ (Better)")
+        ax.set_ylabel("Spearman $\\rho$ $\\rightarrow$ (Better)")
         ax.grid(True)
 
     axes[0].legend(loc='lower right', fontsize=12)
@@ -376,7 +386,7 @@ if __name__ == "__main__":
             if r == 0:
                 ax.set_title(PRETTY_NAME[ds_name.lower()])
             if c == 0:
-                ax.set_ylabel(metric.upper() if metric == 'rmse' else "Spearman Rho")
+                ax.set_ylabel(metric.upper() if metric == 'rmse' else "Spearman $\\rho$")
 
             if r == 0 and c == 0:
                 handles, labels = ax.get_legend_handles_labels()
