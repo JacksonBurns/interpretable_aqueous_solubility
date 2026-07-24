@@ -48,8 +48,9 @@ statsmodels
 ### Execution
 
 First run `experiments/fit.py` to actually fit the models.
-With a consumer grade GPU for `CheMeleon` and sufficient memory for `SyMANTIC`, this should take 5-10 minutes using the RDKit descriptors or ~30 minutes with the `mordred` descriptors.
+This takes ~1-2 days depending on the available CPU and GPU.
 At the end, `biogen_pred.csv` and `ochem_pred.csv`, containing the predictions for the models, will be written to disk.
+For the sake of reproducibility, the results of previous executions are saved as `*_pred.csv.xz`, which can be uncompressed and analyzed.
 
 After that, execute `experiments/analyze.py` to generate parity plots and the final comparison statistics for all of the models.
 

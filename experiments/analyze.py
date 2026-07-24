@@ -1,21 +1,16 @@
 import os
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from scipy.stats import pearsonr
+from scipy.stats import pearsonr, spearmanr
 from sklearn.metrics import mean_absolute_error, mean_squared_error
-from scipy.stats import spearmanr
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
-
 
 RESULT_DIR = "../results/"
 os.makedirs(RESULT_DIR, exist_ok=True)
 
-
 _df = pd.read_csv("../data/aqsoldbc_no_overlap.csv")
-
 REASONABLE_MIN = _df["logS"].min()
 REASONABLE_MAX = _df["logS"].max()
 
@@ -27,6 +22,18 @@ MODEL_COLORS = {
     "symantic_greedy": "#ffbb78",  # light orange
     "pysr_greedy": "#98df8a",  # light green
     "rf": "#9467bd",  # purple
+    "chemprop": "#f717ff",  # pink
+}
+
+MODEL_MARKERS = {
+    "esol": "o",
+    "symantic_utopia": "s",
+    "pysr_utopia": "^",
+    "chemeleon": "D",
+    "chemprop": ".",
+    "symantic_greedy": "P",
+    "pysr_greedy": "X",
+    "rf": "v",
 }
 
 MODEL_MARKERS = {
@@ -49,7 +56,13 @@ PRETTY_NAME = {
     "rf": "Random Forest",
     "biogen": "Biogen",
     "ochem": "OChem",
+    "chemprop": "Chemprop",
 }
+
+# Alpha = 0.05, corrected for 8 comparisons
+alpha = 0.05
+n_comparisons = len(MODEL_COLORS)
+BONFERRONI_CORRECTED_CI = [100 * (alpha / n_comparisons), 100 * (1 - (alpha / n_comparisons))]
 
 
 def replace_errors(df):
@@ -244,33 +257,43 @@ if __name__ == "__main__":
         
         best_rmse_model = min(models, key=lambda m: means[m]['rmse'])
         best_spearman_model = max(models, key=lambda m: means[m]['spearman'])
+
+        best_rmse_boot = np.array(boot_results[ds_name][best_rmse_model]['rmse'])
+        best_spearman_boot = np.array(boot_results[ds_name][best_spearman_model]['spearman'])
         
         indist_rmse = [best_rmse_model]
         indist_spearman = [best_spearman_model]
         
-        best_rmse_boot = np.array(boot_results[ds_name][best_rmse_model]['rmse'])
-        best_spearman_boot = np.array(boot_results[ds_name][best_spearman_model]['spearman'])
-        
         for m in models:
             if m != best_rmse_model:
+                # Is 0 in the CI of the paired difference?
                 diff = np.array(boot_results[ds_name][m]['rmse']) - best_rmse_boot
-                ci = np.percentile(diff, [0.416, 99.584])  # 7-way bonferroni correction
-                if ci[0] <= 0 <= ci[1]: indist_rmse.append(m)
+                ci = np.percentile(diff, BONFERRONI_CORRECTED_CI)
+                if ci[0] <= 0 <= ci[1]:
+                    indist_rmse.append(m)
+                    
             if m != best_spearman_model:
-                diff = best_spearman_boot - np.array(boot_results[ds_name][m]['spearman'])
-                ci = np.percentile(diff, [0.416, 99.584])  # 7-way bonferroni correction
-                if ci[0] <= 0 <= ci[1]: indist_spearman.append(m)
+                # Is 0 in the CI of the paired difference?
+                diff = np.array(boot_results[ds_name][m]['spearman']) - best_spearman_boot
+                ci = np.percentile(diff, BONFERRONI_CORRECTED_CI)
+                if ci[0] <= 0 <= ci[1]:
+                    indist_spearman.append(m)
                     
         indistinguishable_full[ds_name]['rmse'] = indist_rmse
         indistinguishable_full[ds_name]['spearman'] = indist_spearman
-        
+
         points = []
         for m in models:
+            r_vals = np.array(boot_results[ds_name][m]['rmse'])
+            s_vals = np.array(boot_results[ds_name][m]['spearman'])
+            
             r_mean = means[m]['rmse']
             s_mean = means[m]['spearman']
             points.append((r_mean, s_mean))
-            r_ci = np.percentile(boot_results[ds_name][m]['rmse'], [0.416, 99.584])  # 7-way bonferroni correction
-            s_ci = np.percentile(boot_results[ds_name][m]['spearman'], [0.416, 99.584])  # 7-way bonferroni correction
+            
+            # Calculate asymmetric error bars directly from the Corrected CI
+            r_ci = np.percentile(r_vals, BONFERRONI_CORRECTED_CI)
+            s_ci = np.percentile(s_vals, BONFERRONI_CORRECTED_CI)
             
             r_err = [[r_mean - r_ci[0]], [r_ci[1] - r_mean]]
             s_err = [[s_mean - s_ci[0]], [s_ci[1] - s_mean]]
@@ -386,7 +409,6 @@ if __name__ == "__main__":
                     
                     if "greedy" not in m:
                         ax.plot(np.log10(x_vals), y_vals, color=MODEL_COLORS[m], zorder=2)
-                        # ax.errorbar(np.log10(x_vals), y_vals, yerr=y_errs, fmt='none', color=MODEL_COLORS[m], alpha=0.2, zorder=1) <-- not needed, marker filledness shows this
 
     for c, (ds_name, df) in enumerate(datasets.items()):
         y_true = df['logS'].values
