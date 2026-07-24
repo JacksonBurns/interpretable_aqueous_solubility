@@ -7,6 +7,7 @@ For comparison, we test all of the below models:
 
  - [ESOL](https://doi.org/10.1021/ci034243x)
  - [`CheMeleon`](https://doi.org/10.48550/arXiv.2506.15792)
+ - Chemprop
  - Random Forest with Morgan Count and RDKit Descriptors, as in [MolPipeline](https://doi.org/10.1021/acs.jcim.4c00863)
  - [`SyMANTIC`](https://doi.org/10.48550/arXiv.2502.03367)
 
