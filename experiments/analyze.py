@@ -146,6 +146,7 @@ def plot_custom_correlation_matrix(df, output_path="results/biogen_corr_combined
         'pysr_utopia_pred': PRETTY_NAME['pysr_utopia'],
         'chemeleon_pred': PRETTY_NAME['chemeleon'],
         'rf_pred': PRETTY_NAME['rf'],
+        'chemprop_pred': PRETTY_NAME['chemprop'],
     }
     df_renamed = df.copy(deep=True).rename(columns=model_names)
     
